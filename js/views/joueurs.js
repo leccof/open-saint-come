@@ -12,7 +12,7 @@
        possibles, présentées noir sur blanc.
    ============================================================================ */
 
-import { h, titre, mention, chapo, filet, bouton, vide } from './dom.js';
+import { ajouter, h, titre, mention, chapo, filet, bouton, vide } from './dom.js';
 import {
   ajouterJoueur, renommerJoueur, supprimerJoueur, doublons,
   planEquipes, peutTirer, problemeEffectif, definirTriplette, demarrerTirage,
@@ -35,7 +35,7 @@ export function rendre(ctx) {
   const souci = problemeEffectif(etat);
 
   /* ---- en-tête et compteur ---------------------------------------------- */
-  racine.append(
+  ajouter(racine, 
     mention(etat.config.venue),
     titre('Les joueurs'),
     h('div', { class: 'entre-deux' },
@@ -83,7 +83,7 @@ export function rendre(ctx) {
       ctx.majEtat(resultat.etat);
     }
 
-    racine.append(
+    ajouter(racine, 
       h('div', { class: 'champ-groupe' },
         h('label', { class: 'champ-libelle', for: 'nouveau-joueur' }, 'Ajouter un joueur'),
         h('div', { class: 'saisie-ligne' },
@@ -105,7 +105,7 @@ export function rendre(ctx) {
      Signalés, jamais bloqués : deux cousins peuvent réellement porter le même
      nom, et c'est à l'organisateur de trancher, pas à l'application. */
   if (lesDoublons.length) {
-    racine.append(
+    ajouter(racine, 
       h('div', { class: 'encart' },
         h('p', { class: 'mention' }, 'Noms en double'),
         h('p', {},
@@ -119,7 +119,7 @@ export function rendre(ctx) {
      Les trois issues, explicitement. C'est le moment où l'organisateur a
      besoin qu'on lui pose la question clairement. */
   if (souci && souci.type === 'impair' && !fige) {
-    racine.append(
+    ajouter(racine, 
       h('div', { class: 'encart encart--signal' },
         h('p', { class: 'section__titre' }, 'Effectif impair'),
         h('p', {}, `${joueurs.length} joueurs : il en manque un pour faire des doublettes. Trois solutions.`),
@@ -144,7 +144,7 @@ export function rendre(ctx) {
 
   /* ---- triplette en vigueur ---------------------------------------------- */
   if (etat.config.triplette && joueurs.length % 2 === 1 && !fige) {
-    racine.append(
+    ajouter(racine, 
       h('div', { class: 'encart' },
         h('p', {}, 'Une triplette est prévue : la dernière équipe formée comptera trois joueurs.'),
         h('div', { class: 'boutons' },
@@ -158,12 +158,12 @@ export function rendre(ctx) {
   }
 
   /* ---- la liste ---------------------------------------------------------- */
-  racine.append(filet());
+  ajouter(racine, filet());
 
   if (!joueurs.length) {
-    racine.append(vide('Aucun joueur pour l’instant.'));
+    ajouter(racine, vide('Aucun joueur pour l’instant.'));
   } else {
-    racine.append(
+    ajouter(racine, 
       h('ul', { class: 'liste' },
         joueurs.map((joueur, i) => {
           if (idEnEdition === joueur.id) {
@@ -229,7 +229,7 @@ export function rendre(ctx) {
   /* ---- lancer le chapeau -------------------------------------------------- */
   if (!fige) {
     const pret = peutTirer(etat);
-    racine.append(
+    ajouter(racine, 
       h('div', { class: 'boutons' },
         bouton('Lancer le chapeau', {
           variante: 'bouton--action bouton--pleine-largeur',
@@ -248,7 +248,7 @@ export function rendre(ctx) {
       )
     );
   } else {
-    racine.append(
+    ajouter(racine, 
       h('div', { class: 'boutons' },
         h('a', {
           class: 'bouton bouton--action bouton--pleine-largeur',

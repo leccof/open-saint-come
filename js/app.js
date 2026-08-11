@@ -17,12 +17,14 @@
    ============================================================================ */
 
 import * as storage from './storage.js';
-import { h, remplir, titre, mention, chapo } from './views/dom.js';
+import { h, remplir, titre, chapo } from './views/dom.js';
 import * as vueAccueil from './views/accueil.js';
 import * as vueConfig from './views/config.js';
 import * as vueJoueurs from './views/joueurs.js';
 import * as vueChapeau from './views/chapeau.js';
 import * as vueTableaux from './views/tableaux.js';
+import * as vueResultats from './views/resultats.js';
+import * as vueRegles from './views/regles.js';
 
 /* ----------------------------------------------------------------------------
    ÉLÉMENTS DE LA PAGE
@@ -180,12 +182,6 @@ function dessinerBandeau() {
    navigable.
    ---------------------------------------------------------------------------- */
 
-/* Les écrans encore à écrire. Ils annoncent leur contenu plutôt que d'afficher
-   une page blanche. */
-const ECRANS_A_VENIR = {
-  resultats: ['Résultats', 'Les deux podiums, le détail de tous les matchs, et l’export JSON de secours.'],
-};
-
 /**
  * Le contexte remis à chaque écran. C'est tout ce qu'une vue a le droit de
  * connaître du reste de l'application : l'état, comment le modifier, comment
@@ -208,9 +204,7 @@ function dessiner() {
   dessinerNav();
 
   if (route.nom === 'regles') {
-    remplir(elContenu,
-      titre('Règles'),
-      chapo('La page des règles arrive à une étape suivante.'));
+    remplir(elContenu, vueRegles.rendre());
     return;
   }
 
@@ -241,13 +235,11 @@ function dessiner() {
     case 'tableaux':
       remplir(elContenu, vueTableaux.rendre(ctx));
       return;
-    default: {
-      const [nom, description] = ECRANS_A_VENIR[route.section] || ECRANS_A_VENIR.resultats;
-      remplir(elContenu,
-        mention(etat.config?.venue || ''),
-        titre(nom),
-        chapo(description));
-    }
+    case 'resultats':
+      remplir(elContenu, vueResultats.rendre(ctx));
+      return;
+    default:
+      remplir(elContenu, vueJoueurs.rendre(ctx));
   }
 }
 

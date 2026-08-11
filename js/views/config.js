@@ -6,7 +6,7 @@
    pouvoir corriger jusqu'à la dernière minute.
    ============================================================================ */
 
-import { h, titre, mention, chapo, filet, bouton } from './dom.js';
+import { ajouter, h, titre, mention, chapo, filet, bouton } from './dom.js';
 import { definirConfig, definirDate, definirPhase } from '../state.js';
 
 let messageCopie = null;
@@ -22,7 +22,7 @@ export function rendre(ctx) {
   const fige = etat.draw.status !== 'idle';
   const racine = h('div');
 
-  racine.append(
+  ajouter(racine, 
     mention(etat.config.venue),
     titre('Configuration'),
     fige
@@ -33,7 +33,7 @@ export function rendre(ctx) {
   /* ---- le code du tournoi ------------------------------------------------
      C'est l'information la plus importante de cet écran : c'est elle qu'on
      dicte aux autres pour qu'ils rejoignent. Elle est donc affichée en grand. */
-  racine.append(
+  ajouter(racine, 
     h('section', { class: 'section' },
       h('p', { class: 'mention' }, 'Code du tournoi'),
       h('p', { class: 'code-geant' }, etat.code),
@@ -60,7 +60,7 @@ export function rendre(ctx) {
   );
 
   /* ---- nom -------------------------------------------------------------- */
-  racine.append(
+  ajouter(racine, 
     h('div', { class: 'champ-groupe' },
       h('label', { class: 'champ-libelle', for: 'nom-tournoi' }, 'Nom du tournoi'),
       h('input', {
@@ -76,7 +76,7 @@ export function rendre(ctx) {
   );
 
   /* ---- date ------------------------------------------------------------- */
-  racine.append(
+  ajouter(racine, 
     h('div', { class: 'champ-groupe' },
       h('label', { class: 'champ-libelle', for: 'date-tournoi' }, 'Date'),
       h('input', {
@@ -90,7 +90,7 @@ export function rendre(ctx) {
   );
 
   /* ---- terrain ---------------------------------------------------------- */
-  racine.append(
+  ajouter(racine, 
     h('div', { class: 'champ-groupe' },
       h('label', { class: 'champ-libelle', for: 'terrain' }, 'Terrain'),
       h('input', {
@@ -114,7 +114,7 @@ export function rendre(ctx) {
     ctx.majEtat(definirConfig(ctx.etat, { announcedPlayers: valeur }));
   }
 
-  racine.append(
+  ajouter(racine, 
     h('div', { class: 'champ-groupe' },
       h('label', { class: 'champ-libelle', for: 'annonce' }, 'Nombre de joueurs annoncé'),
       h('div', { class: 'saisie-ligne' },
@@ -151,7 +151,7 @@ export function rendre(ctx) {
   );
 
   /* ---- suite ------------------------------------------------------------ */
-  racine.append(
+  ajouter(racine, 
     h('div', { class: 'boutons' },
       bouton('Passer aux joueurs', {
         variante: 'bouton--action bouton--pleine-largeur',

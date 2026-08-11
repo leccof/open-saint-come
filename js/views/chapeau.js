@@ -14,7 +14,7 @@
         l'animation la ferait disparaître.
    ============================================================================ */
 
-import { h, titre, mention, chapo, filet, bouton, vide } from './dom.js';
+import { ajouter, h, titre, mention, chapo, filet, bouton, vide } from './dom.js';
 import { nomJoueur, nomEquipe, renommerEquipe, planEquipes } from '../state.js';
 import {
   tirerUnNom, annulerDernierTirage, tirageTermine,
@@ -82,7 +82,7 @@ export function rendre(ctx) {
   const restants = etat.draw.remaining.length;
   const termine = tirageTermine(etat);
 
-  racine.append(
+  ajouter(racine, 
     mention(etat.config.venue),
     titre('Le chapeau'),
     termine
@@ -96,7 +96,7 @@ export function rendre(ctx) {
 
   const fenetre = h('div', { class: 'rouleau' });
   const piste = h('div', { class: 'rouleau__piste' });
-  fenetre.append(piste);
+  ajouter(fenetre, piste);
 
   const legende = h('p', { class: 'chapeau-scene__legende' });
 
@@ -138,7 +138,7 @@ export function rendre(ctx) {
 
   afficherRepos();
 
-  racine.append(
+  ajouter(racine, 
     h('div', { class: 'chapeau-scene' }, fenetre, legende)
   );
 
@@ -195,8 +195,8 @@ export function rendre(ctx) {
       },
     });
 
-    racine.append(boutonTirer);
-    racine.append(
+    ajouter(racine, boutonTirer);
+    ajouter(racine, 
       h('p', { class: 'chapeau-reste' },
         restants === 0
           ? 'Le chapeau est vide.'
@@ -208,7 +208,7 @@ export function rendre(ctx) {
      Volontairement discret : un chapeau qu'on refait, c'est un chapeau qu'on
      conteste. Mais une fausse manip doit rester rattrapable. */
   if (etat.draw.order.length > 0 && !enCoursDAnimation) {
-    racine.append(
+    ajouter(racine, 
       h('div', { class: 'boutons' },
         bouton('Annuler le dernier tirage', {
           variante: 'bouton--discret bouton--pleine-largeur',
@@ -226,8 +226,8 @@ export function rendre(ctx) {
      LES ÉQUIPES FORMÉES
      ====================================================================== */
 
-  racine.append(filet());
-  racine.append(
+  ajouter(racine, filet());
+  ajouter(racine, 
     h('div', { class: 'entre-deux' },
       h('h2', { class: 'section__titre' }, 'Les équipes'),
       plan ? h('span', { class: 'ligne__secondaire' }, `${etat.teams.length} / ${plan.nbEquipes}`) : null
@@ -235,9 +235,9 @@ export function rendre(ctx) {
   );
 
   if (!etat.teams.length) {
-    racine.append(vide('Aucune équipe pour l’instant.'));
+    ajouter(racine, vide('Aucune équipe pour l’instant.'));
   } else {
-    racine.append(
+    ajouter(racine, 
       h('ul', {},
         etat.teams.map((equipe, i) => {
           if (equipeEnEdition === equipe.id) {
@@ -292,7 +292,7 @@ export function rendre(ctx) {
      ====================================================================== */
 
   if (termine) {
-    racine.append(
+    ajouter(racine, 
       h('div', { class: 'boutons' },
         bouton('Créer les tableaux', {
           variante: 'bouton--action bouton--pleine-largeur',

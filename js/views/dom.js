@@ -50,6 +50,20 @@ function ajouterEnfants(el, enfants) {
   }
 }
 
+/**
+ * Ajoute des enfants à un élément existant.
+ *
+ * À UTILISER PARTOUT À LA PLACE DE element.append(). La méthode native du
+ * navigateur convertit null en la chaîne « null » et l'affiche à l'écran : un
+ * `condition ? element : null` suffit donc à faire apparaître un « null » au
+ * milieu d'une page. Celle-ci ignore null, false et undefined, exactement
+ * comme h() le fait pour ses enfants.
+ */
+export function ajouter(el, ...enfants) {
+  ajouterEnfants(el, enfants);
+  return el;
+}
+
 /** Vide un élément de tout son contenu. */
 export function vider(el) {
   while (el.firstChild) el.removeChild(el.firstChild);

@@ -7,7 +7,7 @@
      · rouvrir un tournoi déjà ouvert sur cet appareil.
    ============================================================================ */
 
-import { h, remplir, titre, mention, chapo, filet, bouton, dateLisible } from './dom.js';
+import { ajouter, h, remplir, titre, mention, chapo, filet, bouton, dateLisible } from './dom.js';
 import * as storage from '../storage.js';
 import { creerEtatInitial } from '../state.js';
 import { DEFAULT_TOURNAMENT_NAME } from '../../config.js';
@@ -34,7 +34,7 @@ export function rendre(ctx) {
   const racine = h('div');
 
   /* ---- en-tête ---------------------------------------------------------- */
-  racine.append(
+  ajouter(racine, 
     mention('Saint-Côme-d’Olt · Pétanque en doublette'),
     titre('Open de Saint-Côme'),
     chapo('Créez un tournoi, ou rejoignez-en un avec son code à six caractères.')
@@ -65,10 +65,10 @@ export function rendre(ctx) {
     },
   });
 
-  racine.append(h('div', { class: 'boutons' }, boutonCreer));
+  ajouter(racine, h('div', { class: 'boutons' }, boutonCreer));
 
   /* ---- rejoindre -------------------------------------------------------- */
-  racine.append(filet());
+  ajouter(racine, filet());
 
   const champCode = h('input', {
     class: 'champ champ--code',
@@ -103,7 +103,7 @@ export function rendre(ctx) {
     ctx.allerA(`#/t/${code}`);
   }
 
-  racine.append(
+  ajouter(racine, 
     h('section', { class: 'section' },
       h('h2', { class: 'section__titre' }, 'Rejoindre un tournoi'),
       h('div', { class: 'champ-groupe' },
@@ -124,7 +124,7 @@ export function rendre(ctx) {
   /* ---- les tournois de cet appareil ------------------------------------- */
   const locaux = storage.listLocalTournaments();
   if (locaux.length) {
-    racine.append(
+    ajouter(racine, 
       h('section', { class: 'section' },
         h('h2', { class: 'section__titre' }, 'Sur cet appareil'),
         h('ul', { class: 'liste' },
@@ -148,7 +148,7 @@ export function rendre(ctx) {
   }
 
   /* ---- règles ----------------------------------------------------------- */
-  racine.append(
+  ajouter(racine, 
     filet(),
     h('div', { class: 'boutons' },
       h('a', { class: 'bouton bouton--discret bouton--pleine-largeur', href: '#/regles' },

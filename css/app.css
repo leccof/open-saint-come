@@ -867,6 +867,129 @@ body.a-navigation .contenu {
 }
 
 /* ============================================================================
+   9 bis. RÉSULTATS ET RÈGLES
+   ============================================================================ */
+
+/* Le podium. Pas de marches dessinées, pas de médailles : un chiffre, un nom,
+   et la première ligne en aplat. La hiérarchie se lit toute seule. */
+.podium {
+  border-top: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+}
+
+.podium__rang {
+  display: flex;
+  align-items: center;
+  gap: var(--sc-e-3);
+  min-height: var(--sc-cible-min);
+  padding: var(--sc-e-3);
+  border-bottom: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+}
+
+/* Le rang. En chiffres de la police des scores, et surtout PAS en Didot :
+   dessiné par une serif à fort contraste, le « 1 » se confond avec un « I »
+   romain, et le podium se met à parler latin. */
+.podium__place {
+  flex: none;
+  width: 1.6em;
+  font-family: var(--sc-police-chiffres);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  font-size: var(--sc-t-grand);
+  font-weight: var(--sc-graisse-titre);
+  line-height: 1;
+  text-align: center;
+  color: var(--sc-texte-doux);
+}
+
+.podium__equipe {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--sc-t-moyen);
+}
+
+/* Le vainqueur : le seul endroit de l'app où l'argile porte du texte, et il
+   est en 24 px gras — bien au-delà du seuil qui l'autorise. */
+.podium__rang--premier {
+  background: var(--sc-signal);
+  color: var(--sc-signal-texte);
+}
+.podium__rang--premier .podium__place { color: var(--sc-signal-texte); }
+.podium__rang--premier .podium__equipe {
+  color: var(--sc-signal-texte);
+  font-family: var(--sc-police-titre);
+  font-size: var(--sc-t-grand);
+  font-weight: var(--sc-graisse-titre);
+}
+
+/* Une ligne du récapitulatif : trois niveaux d'information, du plus discret au
+   plus lisible. */
+.recap {
+  padding: var(--sc-e-3) 0;
+  border-bottom: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+}
+
+.recap__tour {
+  font-size: var(--sc-t-micro);
+  font-weight: var(--sc-graisse-forte);
+  letter-spacing: var(--sc-lettres-capitales);
+  text-transform: uppercase;
+  color: var(--sc-texte-doux);
+}
+
+.recap__equipes { font-size: var(--sc-t-moyen); margin-top: 2px; }
+
+.recap__manches {
+  margin-top: 2px;
+  font-family: var(--sc-police-chiffres);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  font-size: var(--sc-t-petit);
+  letter-spacing: 0.04em;
+  color: var(--sc-texte-doux);
+}
+
+/* Le sommaire des règles : on doit pouvoir sauter à la bonne section depuis le
+   bord du terrain, sans faire défiler dix écrans. */
+.sommaire {
+  margin: var(--sc-e-4) 0 var(--sc-e-6);
+  border-top: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+}
+
+.sommaire__lien {
+  display: flex;
+  align-items: center;
+  min-height: var(--sc-cible-min);
+  padding: var(--sc-e-2) 0;
+  border-bottom: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+  color: var(--sc-texte);
+  text-decoration: none;
+  font-size: var(--sc-t-base);
+}
+
+.regle__texte { margin-bottom: var(--sc-e-3); }
+
+.regle__points {
+  border-top: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+}
+
+.regle__point {
+  position: relative;
+  padding: var(--sc-e-3) 0 var(--sc-e-3) var(--sc-e-5);
+  border-bottom: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+}
+
+/* Une puce dessinée en CSS plutôt qu'un caractère : elle reste alignée sur la
+   première ligne, quelle que soit la longueur du point. */
+.regle__point::before {
+  content: '';
+  position: absolute;
+  left: var(--sc-e-2);
+  top: calc(var(--sc-e-3) + 0.6em);
+  width: 6px;
+  height: 6px;
+  border-radius: var(--sc-arrondi-rond);
+  background: var(--sc-trait);
+}
+
+/* ============================================================================
    10. UTILITAIRES
    ============================================================================ */
 

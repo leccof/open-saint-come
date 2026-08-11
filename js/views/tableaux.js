@@ -16,7 +16,7 @@
       tient dans une grille de treize touches. Deux appuis par manche.
    ============================================================================ */
 
-import { h, titre, mention, chapo, bouton, vide } from './dom.js';
+import { ajouter, h, titre, mention, chapo, bouton, vide } from './dom.js';
 import { nomEquipe, definirMatchEnCours, definirPhase } from '../state.js';
 import {
   matchsDuTour, nomDuTour, enregistrerManches, matchsAvalDejaJoues,
@@ -125,7 +125,7 @@ function panneauSaisie(ctx, match) {
     if (complete) {
       const scoreA = d.gagnant === 'A' ? points : d.perdant;
       const scoreB = d.gagnant === 'B' ? points : d.perdant;
-      bloc.append(
+      ajouter(bloc, 
         h('div', { class: 'manche manche--repliee' },
           h('span', { class: 'manche__resume' },
             h('span', { class: 'manche__titre' }, `Manche ${i + 1} `),
@@ -151,7 +151,7 @@ function panneauSaisie(ctx, match) {
 
     if (!d.gagnant) {
       // Étape 1 : qui a gagné la manche ?
-      manche.append(
+      ajouter(manche, 
         h('p', { class: 'manche__question' }, 'Qui a gagné cette manche ?'),
         h('div', { class: 'boutons' },
           bouton(nomA, {
@@ -169,7 +169,7 @@ function panneauSaisie(ctx, match) {
       const nomPerdant = d.gagnant === 'A' ? nomB : nomA;
       const nomGagnant = d.gagnant === 'A' ? nomA : nomB;
 
-      manche.append(
+      ajouter(manche, 
         h('p', { class: 'manche__question' },
           h('strong', {}, nomGagnant), ` est à ${points}. Combien pour ${nomPerdant} ?`),
         h('div', { class: 'grille-scores' },
@@ -188,7 +188,7 @@ function panneauSaisie(ctx, match) {
       );
     }
 
-    bloc.append(manche);
+    ajouter(bloc, manche);
   });
 
   /* ---- validation --------------------------------------------------------- */
@@ -196,7 +196,7 @@ function panneauSaisie(ctx, match) {
   const decide = compte.a >= aGagner || compte.b >= aGagner;
   const manches = manchesDepuisBrouillon(affichees, points);
 
-  bloc.append(
+  ajouter(bloc, 
     h('div', { class: 'boutons' },
       bouton(decide ? 'Enregistrer le résultat' : 'Enregistrer les manches saisies', {
         variante: 'bouton--action bouton--pleine-largeur',
@@ -265,7 +265,7 @@ function carteMatch(ctx, match, numero) {
         : match.status === 'pret' ? (surLeTerrain ? 'Sur le terrain' : 'À jouer')
           : 'En attente';
 
-  cadre.append(
+  ajouter(cadre, 
     h('div', { class: 'cadre__entete' },
       h('span', {}, `Match ${numero}`),
       h('span', {}, etiquette))
@@ -287,17 +287,17 @@ function carteMatch(ctx, match, numero) {
     );
   };
 
-  cadre.append(ligneEquipe(match.teamA, 'A'));
+  ajouter(cadre, ligneEquipe(match.teamA, 'A'));
   if (match.status === 'bye') {
-    cadre.append(h('div', { class: 'equipe equipe--attente' },
+    ajouter(cadre, h('div', { class: 'equipe equipe--attente' },
       h('span', { class: 'equipe__nom' }, 'Exemptée — passe au tour suivant')));
   } else {
-    cadre.append(ligneEquipe(match.teamB, 'B'));
+    ajouter(cadre, ligneEquipe(match.teamB, 'B'));
   }
 
   /* ---- actions ------------------------------------------------------------ */
   if (matchOuvert === match.id) {
-    cadre.append(panneauSaisie(ctx, match));
+    ajouter(cadre, panneauSaisie(ctx, match));
   } else if (match.status === 'pret' || match.status === 'termine') {
     const actions = h('div', { class: 'saisie-match' },
       h('div', { class: 'boutons boutons--cote-a-cote' },
@@ -313,7 +313,7 @@ function carteMatch(ctx, match, numero) {
           })
           : null
       ));
-    cadre.append(actions);
+    ajouter(cadre, actions);
   }
 
   return cadre;
@@ -327,11 +327,11 @@ export function rendre(ctx) {
   const etat = ctx.etat;
   const racine = h('div');
 
-  racine.append(mention(etat.config.venue), titre('Les tableaux'));
+  ajouter(racine, mention(etat.config.venue), titre('Les tableaux'));
 
   /* ---- pas encore de tableau --------------------------------------------- */
   if (!etat.brackets.main) {
-    racine.append(
+    ajouter(racine, 
       chapo('Le tableau se crée à la fin du chapeau, quand toutes les équipes sont formées.'),
       h('div', { class: 'boutons' },
         h('a', { class: 'bouton bouton--action bouton--pleine-largeur', href: `#/t/${etat.code}/chapeau` },
@@ -343,7 +343,7 @@ export function rendre(ctx) {
   /* ---- le terrain --------------------------------------------------------- */
   const aJouer = prochainMatch(etat);
   if (aJouer) {
-    racine.append(
+    ajouter(racine, 
       h('div', { class: 'terrain' },
         h('p', { class: 'terrain__libelle' },
           etat.currentMatchId === aJouer.id ? 'En cours sur le terrain' : 'Prochain match'),
@@ -358,7 +358,7 @@ export function rendre(ctx) {
 
   /* ---- onglets ------------------------------------------------------------ */
   const consolanteExiste = !!etat.brackets.consolante;
-  racine.append(
+  ajouter(racine, 
     h('div', { class: 'onglets', role: 'tablist' },
       h('button', {
         class: 'onglet', type: 'button', role: 'tab',
@@ -376,7 +376,7 @@ export function rendre(ctx) {
   /* ---- la consolante n'existe pas encore ---------------------------------- */
   if (onglet === 'consolante' && !consolanteExiste) {
     const prete = consolantePrete(etat);
-    racine.append(
+    ajouter(racine, 
       chapo(prete
         ? 'Les équipes de la consolante sont connues.'
         : 'La consolante accueille toute équipe qui perd son premier match joué. ' +
@@ -397,7 +397,7 @@ export function rendre(ctx) {
 
   /* ---- consolante devenue incohérente ------------------------------------- */
   if (prefixe === 'consolante' && consolanteObsolete(etat)) {
-    racine.append(
+    ajouter(racine, 
       h('div', { class: 'encart encart--signal' },
         h('p', { class: 'section__titre' }, 'Consolante à refaire'),
         h('p', {}, 'Un score du tableau principal a changé : les équipes inscrites ici ne sont plus les bonnes.'),
@@ -426,7 +426,7 @@ export function rendre(ctx) {
 
   const tour = tourAffiche[prefixe];
 
-  racine.append(
+  ajouter(racine, 
     h('div', { class: 'tours' },
       h('button', {
         class: 'tours__fleche', type: 'button', 'aria-label': 'Tour précédent',
@@ -446,9 +446,9 @@ export function rendre(ctx) {
   /* ---- les matchs du tour --------------------------------------------------- */
   const matchs = matchsDuTour(etat, prefixe, tour);
   if (!matchs.length) {
-    racine.append(vide('Aucun match à ce tour.'));
+    ajouter(racine, vide('Aucun match à ce tour.'));
   } else {
-    racine.append(
+    ajouter(racine, 
       h('div', { style: { marginTop: 'var(--sc-e-4)' } },
         matchs.map((m, i) => carteMatch(ctx, m, i + 1)))
     );
@@ -457,7 +457,7 @@ export function rendre(ctx) {
   /* ---- fin du tournoi -------------------------------------------------------- */
   const podiumPrincipal = podium(etat, 'main');
   if (podiumPrincipal && etat.phase !== 'termine') {
-    racine.append(
+    ajouter(racine, 
       h('div', { class: 'boutons' },
         bouton('Voir les résultats', {
           variante: 'bouton--action bouton--pleine-largeur',
