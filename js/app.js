@@ -199,7 +199,39 @@ function contexte() {
   };
 }
 
+/**
+ * Dessine l'écran, en protégeant l'application d'un écran qui planterait.
+ *
+ * POURQUOI CE FILET. Sans lui, une erreur dans une vue interrompt le dessin
+ * AVANT que le contenu ne soit remplacé : l'écran précédent reste affiché, et
+ * rien n'indique que quoi que ce soit s'est mal passé. On croit à un problème
+ * de réseau, on recharge, on recommence — et le vrai message d'erreur dort
+ * dans la console.
+ *
+ * Un tournoi ne se met pas en pause pendant qu'on cherche. Mieux vaut un écran
+ * qui dit « ça a planté, voici quoi faire » qu'un écran figé.
+ */
 function dessiner() {
+  try {
+    dessinerEcran();
+  } catch (err) {
+    console.error('[app] l’écran n’a pas pu être dessiné', err);
+    remplir(elContenu,
+      titre('Cet écran n’a pas pu s’afficher'),
+      chapo('Le tournoi lui-même n’est pas perdu : il est enregistré sur cet appareil et sur le serveur.'),
+      h('p', { class: 'ligne__secondaire' }, String(err && err.message ? err.message : err)),
+      h('div', { class: 'boutons' },
+        h('a', { class: 'bouton bouton--action bouton--pleine-largeur', href: '#/' },
+          'Retour à l’accueil'),
+        h('button', {
+          class: 'bouton bouton--discret bouton--pleine-largeur',
+          type: 'button',
+          onclick: () => location.reload(),
+        }, 'Recharger la page')));
+  }
+}
+
+function dessinerEcran() {
   dessinerBandeau();
   dessinerNav();
 

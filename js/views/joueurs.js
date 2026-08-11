@@ -67,10 +67,15 @@ export function rendre(ctx) {
       autocomplete: 'off',
       spellcheck: 'false',
       oninput: (e) => { saisie = e.target.value; },
-      onkeydown: (e) => { if (e.key === 'Enter') { e.preventDefault(); ajouter(); } },
+      onkeydown: (e) => { if (e.key === 'Enter') { e.preventDefault(); ajouterLeJoueur(); } },
     });
 
-    function ajouter() {
+    /* Le nom de cette fonction ne doit PAS être « ajouter » : c'est déjà celui
+       de l'utilitaire importé de dom.js, et une fonction locale masque
+       l'import à l'intérieur de son bloc. Le code appelait alors cette
+       fonction-ci en croyant remplir la page, ce qui redessinait l'écran en
+       boucle jusqu'à épuisement de la pile — et l'écran ne s'affichait jamais. */
+    function ajouterLeJoueur() {
       const resultat = ajouterJoueur(ctx.etat, saisie);
       if (resultat.erreur) {
         erreur = resultat.erreur;
@@ -88,7 +93,7 @@ export function rendre(ctx) {
         h('label', { class: 'champ-libelle', for: 'nouveau-joueur' }, 'Ajouter un joueur'),
         h('div', { class: 'saisie-ligne' },
           champ,
-          bouton('Ajouter', { variante: 'bouton--action', onclick: ajouter })
+          bouton('Ajouter', { variante: 'bouton--action', onclick: ajouterLeJoueur })
         ),
         erreur ? h('p', { class: 'champ-erreur' }, erreur) : null
       )
@@ -202,14 +207,19 @@ export function rendre(ctx) {
               joueur.name,
               enDouble ? h('span', { class: 'ligne__secondaire' }, ' · en double') : null
             ),
-            fige ? null : h('div', { class: 'ligne__actions' },
+            /* Le crayon reste disponible MÊME APRÈS le lancement du tirage :
+               corriger une faute de frappe ne change rien au tirage, et c'est
+               précisément en lisant les noms à voix haute qu'on repère les
+               coquilles. Seuls l'ajout et la suppression sont bloqués, parce
+               qu'eux modifieraient l'effectif. */
+            h('div', { class: 'ligne__actions' },
               h('button', {
                 class: 'bouton-icone',
                 type: 'button',
                 'aria-label': `Modifier ${joueur.name}`,
                 onclick: () => { idEnEdition = joueur.id; ctx.rafraichir(); },
               }, '✎'),
-              h('button', {
+              fige ? null : h('button', {
                 class: 'bouton-icone',
                 type: 'button',
                 'aria-label': `Retirer ${joueur.name}`,
@@ -249,6 +259,8 @@ export function rendre(ctx) {
     );
   } else {
     ajouter(racine, 
+      h('p', { class: 'champ-erreur centre' },
+        'Le tirage est lancé : la liste est close. Les noms restent corrigeables.'),
       h('div', { class: 'boutons' },
         h('a', {
           class: 'bouton bouton--action bouton--pleine-largeur',
