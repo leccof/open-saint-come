@@ -1,0 +1,283 @@
+/* ============================================================================
+   app.js — le point d'entrée : navigation entre les écrans.
+   ----------------------------------------------------------------------------
+   Ce fichier ne contient AUCUNE logique de tournoi et AUCUN accès au réseau.
+   Son travail :
+
+     · lire l'adresse (#/t/ABC123/chapeau) et décider quel écran afficher ;
+     · charger le tournoi correspondant via storage.js ;
+     · garder l'indicateur de synchronisation à jour ;
+     · redessiner l'écran quand l'état change.
+
+   LA NAVIGATION PASSE PAR LE FRAGMENT D'URL (le # ). C'est une contrainte de
+   GitHub Pages : le serveur ne sait servir que des fichiers existants. Avec des
+   adresses classiques, /t/ABC123 renverrait une erreur 404. Ce qui suit le #
+   n'est jamais envoyé au serveur, donc tout fonctionne, et le lien reste
+   partageable et collable dans un QR code.
+   ============================================================================ */
+
+import * as storage from './storage.js';
+import { h, remplir, titre, mention, chapo } from './views/dom.js';
+
+/* ----------------------------------------------------------------------------
+   ÉLÉMENTS DE LA PAGE
+   ---------------------------------------------------------------------------- */
+
+const elContenu = document.getElementById('contenu');
+const elStatut = document.getElementById('statut');
+const elNav = document.getElementById('nav');
+const elTitre = document.getElementById('bandeau-titre');
+const elCode = document.getElementById('bandeau-code');
+
+/* ----------------------------------------------------------------------------
+   L'ÉTAT COURANT DE L'APPLICATION
+   ----------------------------------------------------------------------------
+   Une seule variable pour le tournoi ouvert. Toute modification passe par
+   majEtat(), qui enregistre et redessine — jamais l'un sans l'autre.
+   ---------------------------------------------------------------------------- */
+
+let etat = null;              // le tournoi ouvert, ou null sur l'accueil
+let route = { nom: 'accueil' };
+let arreterVeille = null;     // pour cesser de surveiller le tournoi précédent
+
+/**
+ * Remplace l'état courant, l'enregistre et redessine l'écran.
+ * C'est LE point de passage unique : si un écran modifie le tournoi sans
+ * appeler cette fonction, la modification ne serait ni enregistrée ni affichée.
+ */
+export function majEtat(nouvelEtat, { enregistrer = true } = {}) {
+  etat = enregistrer ? storage.saveTournament(nouvelEtat) : nouvelEtat;
+  dessiner();
+}
+
+export function etatCourant() {
+  return etat;
+}
+
+/* ----------------------------------------------------------------------------
+   L'INDICATEUR DE SYNCHRONISATION
+   ---------------------------------------------------------------------------- */
+
+const LIBELLE_STATUT = {
+  synchronise: 'Synchronisé',
+  attente: 'En attente',
+  horsligne: 'Hors ligne',
+};
+
+storage.onStatut((s) => {
+  elStatut.className = `statut statut--${s}`;
+  remplir(
+    elStatut,
+    h('span', { class: 'statut__pastille', 'aria-hidden': 'true' }),
+    h('span', { class: 'statut__texte' }, LIBELLE_STATUT[s] || s)
+  );
+});
+
+/* ----------------------------------------------------------------------------
+   LECTURE DE L'ADRESSE
+   ----------------------------------------------------------------------------
+   Formes reconnues :
+     #/                       l'accueil
+     #/regles                 la page des règles, accessible de partout
+     #/t/ABC123               un tournoi — on choisit l'écran selon son avancement
+     #/t/ABC123/joueurs       une section précise
+   ---------------------------------------------------------------------------- */
+
+const SECTIONS = ['config', 'joueurs', 'chapeau', 'tableaux', 'resultats'];
+
+function lireRoute() {
+  const brut = (location.hash || '').replace(/^#/, '');
+  const morceaux = brut.split('/').filter(Boolean);
+
+  if (morceaux[0] === 'regles') return { nom: 'regles' };
+
+  if (morceaux[0] === 't' && morceaux[1]) {
+    const code = storage.normaliserCode(morceaux[1]);
+    if (!code) return { nom: 'accueil' };
+    const section = SECTIONS.includes(morceaux[2]) ? morceaux[2] : null;
+    return { nom: 'tournoi', code, section };
+  }
+
+  return { nom: 'accueil' };
+}
+
+/** L'écran à proposer par défaut, selon l'avancement du tournoi. */
+function sectionParDefaut(etatTournoi) {
+  if (!etatTournoi) return 'config';
+  switch (etatTournoi.phase) {
+    case 'config': return 'config';
+    case 'joueurs': return 'joueurs';
+    case 'tirage': return 'chapeau';
+    case 'tableaux': return 'tableaux';
+    case 'termine': return 'resultats';
+    default: return 'joueurs';
+  }
+}
+
+export function allerA(chemin) {
+  location.hash = chemin;
+}
+
+/* ----------------------------------------------------------------------------
+   LA NAVIGATION DU BAS
+   ---------------------------------------------------------------------------- */
+
+const ENTREES_NAV = [
+  { section: 'joueurs', libelle: 'Joueurs' },
+  { section: 'chapeau', libelle: 'Chapeau' },
+  { section: 'tableaux', libelle: 'Tableaux' },
+  { section: 'resultats', libelle: 'Résultats' },
+];
+
+function dessinerNav() {
+  const dansUnTournoi = route.nom === 'tournoi' && etat;
+  elNav.hidden = !dansUnTournoi;
+  document.body.classList.toggle('a-navigation', dansUnTournoi);
+  if (!dansUnTournoi) return;
+
+  remplir(
+    elNav,
+    ENTREES_NAV.map((e) =>
+      h('a', {
+        class: 'nav__lien',
+        href: `#/t/${etat.code}/${e.section}`,
+        'aria-current': route.section === e.section ? 'page' : null,
+      }, e.libelle)
+    ),
+    h('a', {
+      class: 'nav__lien',
+      href: '#/regles',
+      'aria-current': route.nom === 'regles' ? 'page' : null,
+    }, 'Règles')
+  );
+}
+
+/* ----------------------------------------------------------------------------
+   LE BANDEAU
+   ---------------------------------------------------------------------------- */
+
+function dessinerBandeau() {
+  if (route.nom === 'tournoi' && etat) {
+    elTitre.textContent = etat.name || 'Tournoi';
+    elCode.textContent = etat.code;
+    elCode.hidden = false;
+  } else {
+    elTitre.textContent = 'Open de Saint-Côme';
+    elCode.hidden = true;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   DESSIN DE L'ÉCRAN
+   ----------------------------------------------------------------------------
+   Les écrans arrivent aux étapes suivantes. Pour l'instant, chacun annonce
+   simplement ce qu'il contiendra : la coquille, elle, est complète et
+   navigable.
+   ---------------------------------------------------------------------------- */
+
+const ECRANS_A_VENIR = {
+  config: ['Configuration', 'Nom du tournoi, date, et effectif annoncé — modifiable tant que le tirage n’est pas lancé.'],
+  joueurs: ['Les joueurs', 'Ajout, modification, suppression. Compteur en direct et détection des doublons.'],
+  chapeau: ['Le chapeau', 'Un seul bouton : « Tirer un nom ». Les joueurs sortent un par un et forment les équipes.'],
+  tableaux: ['Les tableaux', 'Principal et consolante, tour par tour, avec la saisie des scores.'],
+  resultats: ['Résultats', 'Les deux podiums, le détail de tous les matchs, et l’export JSON de secours.'],
+};
+
+function dessiner() {
+  dessinerBandeau();
+  dessinerNav();
+
+  if (route.nom === 'regles') {
+    remplir(elContenu,
+      titre('Règles'),
+      chapo('La page des règles arrive à l’étape suivante.'));
+    return;
+  }
+
+  if (route.nom === 'accueil') {
+    remplir(elContenu,
+      mention('Saint-Côme-d’Olt · 15 août'),
+      titre('Open de Saint-Côme'),
+      chapo('Créer un tournoi, ou en rejoindre un avec son code à 6 caractères.'),
+      h('p', { class: 'vide' }, 'L’accueil arrive à l’étape suivante.'));
+    return;
+  }
+
+  if (!etat) {
+    remplir(elContenu,
+      titre('Chargement…'),
+      chapo('Recherche du tournoi ' + route.code + '.'));
+    return;
+  }
+
+  const [nom, description] = ECRANS_A_VENIR[route.section] || ECRANS_A_VENIR.joueurs;
+  remplir(elContenu,
+    mention(etat.config?.venue || ''),
+    titre(nom),
+    chapo(description));
+}
+
+/* ----------------------------------------------------------------------------
+   CHANGEMENT D'ADRESSE
+   ---------------------------------------------------------------------------- */
+
+async function surChangementDeRoute() {
+  const nouvelle = lireRoute();
+
+  // On quitte un tournoi : on cesse de le surveiller.
+  if (arreterVeille && (nouvelle.nom !== 'tournoi' || nouvelle.code !== route.code)) {
+    arreterVeille();
+    arreterVeille = null;
+  }
+
+  const memeTournoi = nouvelle.nom === 'tournoi' && etat && etat.code === nouvelle.code;
+  route = nouvelle;
+
+  if (nouvelle.nom !== 'tournoi') {
+    etat = null;
+    dessiner();
+    return;
+  }
+
+  if (!memeTournoi) {
+    etat = null;
+    dessiner();                                   // affiche « Chargement… »
+
+    const charge = await storage.loadTournament(nouvelle.code);
+    if (route.code !== nouvelle.code) return;     // l'utilisateur est déjà reparti
+
+    if (!charge) {
+      remplir(elContenu,
+        titre('Tournoi introuvable'),
+        chapo(`Aucun tournoi ne porte le code ${nouvelle.code}. Vérifiez les six caractères.`),
+        h('div', { class: 'boutons' },
+          h('a', { class: 'bouton bouton--action', href: '#/' }, 'Retour à l’accueil')));
+      return;
+    }
+
+    etat = charge;
+
+    // On surveille les modifications faites depuis un autre appareil.
+    arreterVeille = storage.watchTournament(etat.code, (distant) => {
+      etat = distant;
+      dessiner();
+    });
+  }
+
+  // Pas de section dans l'adresse : on propose celle qui correspond à
+  // l'avancement, et on corrige l'adresse pour qu'elle reste partageable.
+  if (!route.section) {
+    const section = sectionParDefaut(etat);
+    location.replace(`#/t/${etat.code}/${section}`);
+    return;
+  }
+
+  dessiner();
+}
+
+/* ----------------------------------------------------------------------------
+   DÉMARRAGE
+   ---------------------------------------------------------------------------- */
+
+window.addEventListener('hashchange', surChangementDeRoute);
+surChangementDeRoute();

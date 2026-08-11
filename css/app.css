@@ -1,0 +1,719 @@
+/* ============================================================================
+   app.css — la mise en page.
+   ----------------------------------------------------------------------------
+   AUCUNE COULEUR N'EST ÉCRITE EN DUR DANS CE FICHIER. Tout passe par les
+   variables de theme.css. Si vous trouvez un « #… » ici, c'est un bug.
+
+   Le fichier applique la philosophie de design de /design/philosophie.md :
+
+     · quatre encres en aplats, aucun dégradé, aucune transparence décorative ;
+     · le TRAIT plutôt que la boîte — des filets fins qui séparent et encadrent,
+       pas des cartes flottantes avec des ombres ;
+     · la hiérarchie par la TAILLE, jamais par la couleur ;
+     · le vide comme matière : marges larges, peu d'éléments, mais grands ;
+     · deux voix typographiques, une serif pour les titres, la sans-serif du
+       système pour tout le reste.
+
+   Ordre du fichier :
+     1. Remise à zéro et fondations
+     2. Bandeau et indicateur de synchronisation
+     3. Contenu et titres
+     4. Boutons
+     5. Champs de saisie
+     6. Listes et lignes
+     7. Cadres (les matchs)
+     8. Onglets
+     9. Navigation du bas
+    10. Utilitaires
+   ============================================================================ */
+
+/* ============================================================================
+   1. REMISE À ZÉRO ET FONDATIONS
+   ============================================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  /* Empêche iOS d'agrandir tout seul le texte quand on tourne le téléphone. */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--sc-fond);
+  color: var(--sc-texte);
+  font-family: var(--sc-police-texte);
+  font-size: var(--sc-t-base);
+  line-height: var(--sc-interligne);
+
+  /* On coupe le rebond élastique horizontal : rien ne défile latéralement ici. */
+  overflow-x: hidden;
+}
+
+h1, h2, h3, p, ul, ol, figure { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+
+/* Le doigt ne doit jamais déclencher la sélection de texte par erreur. */
+button, .nav__lien, .onglet { -webkit-user-select: none; user-select: none; }
+
+/* Pas de surbrillance bleue au toucher sur iOS : on gère nous-mêmes le retour
+   visuel, plus discret et dans la palette. */
+button, a { -webkit-tap-highlight-color: transparent; }
+
+/* Le contour de focus : franc, dans l'encre, jamais supprimé. Quelqu'un qui
+   navigue au clavier doit voir où il est. */
+:focus-visible {
+  outline: 3px solid var(--sc-texte);
+  outline-offset: 2px;
+}
+
+/* Lien d'évitement, caché jusqu'à ce qu'on l'atteigne au clavier. */
+.saut-contenu {
+  position: absolute;
+  left: var(--sc-e-4);
+  top: calc(-1 * var(--sc-e-8));
+  z-index: 10;
+  padding: var(--sc-e-3) var(--sc-e-4);
+  background: var(--sc-fond-inverse);
+  color: var(--sc-texte-inverse);
+  text-decoration: none;
+  border-radius: var(--sc-arrondi);
+  transition: top var(--sc-duree-courte) var(--sc-courbe);
+}
+.saut-contenu:focus { top: var(--sc-e-4); }
+
+/* ============================================================================
+   2. BANDEAU ET INDICATEUR DE SYNCHRONISATION
+   ============================================================================ */
+
+.bandeau {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sc-e-3);
+
+  padding: var(--sc-e-3) var(--sc-e-4);
+  padding-top: calc(var(--sc-e-3) + var(--sc-marge-haut));
+
+  background: var(--sc-fond-inverse);
+  color: var(--sc-texte-inverse);
+}
+
+.bandeau__identite {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;                 /* autorise la troncature du nom */
+}
+
+.bandeau__titre {
+  font-family: var(--sc-police-titre);
+  font-size: var(--sc-t-moyen);
+  line-height: var(--sc-interligne-serre);
+  letter-spacing: var(--sc-lettres-titre);
+
+  /* Un nom de tournoi trop long est coupé plutôt que de pousser le statut
+     hors de l'écran. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Le code à 6 caractères : c'est ce qu'on dicte aux autres, il doit être
+   parfaitement lisible, donc en chasse fixe et bien espacé. */
+.bandeau__code {
+  font-size: var(--sc-t-micro);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  letter-spacing: var(--sc-lettres-capitales);
+  opacity: 0.85;
+}
+
+.statut {
+  display: flex;
+  align-items: center;
+  gap: var(--sc-e-2);
+  flex: none;
+  font-size: var(--sc-t-micro);
+  letter-spacing: 0.04em;
+}
+
+/* La pastille. ATTENTION : la couleur ne porte JAMAIS l'information seule —
+   le texte à côté dit toujours l'état, et « hors ligne » se distingue aussi
+   par sa forme (pastille creuse). Indispensable pour les daltoniens, et bien
+   pratique en plein soleil quand les teintes se lavent. */
+.statut__pastille {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: var(--sc-arrondi-rond);
+  border: 2px solid var(--sc-etat-ok);
+  background: var(--sc-etat-ok);
+}
+
+.statut--synchronise .statut__pastille {
+  border-color: var(--sc-etat-ok);
+  background: var(--sc-etat-ok);
+}
+.statut--attente .statut__pastille {
+  border-color: var(--sc-etat-attente);
+  background: var(--sc-etat-attente);
+}
+.statut--horsligne .statut__pastille {
+  border-color: var(--sc-etat-ok);
+  background: var(--sc-etat-horsligne);   /* creuse : transparent */
+}
+
+/* ============================================================================
+   3. CONTENU ET TITRES
+   ============================================================================ */
+
+.contenu {
+  max-width: var(--sc-largeur-max);
+  margin: 0 auto;
+  padding: var(--sc-e-5) var(--sc-e-4) var(--sc-e-8);
+}
+
+/* Quand la navigation du bas est affichée, on dégage la place pour elle. */
+body.a-navigation .contenu {
+  padding-bottom: calc(var(--sc-e-8) + var(--sc-cible-min) + var(--sc-marge-bas));
+}
+
+.contenu:focus { outline: none; }
+
+.titre-ecran {
+  font-family: var(--sc-police-titre);
+  font-size: var(--sc-t-titre);
+  font-weight: var(--sc-graisse-titre);
+  line-height: var(--sc-interligne-serre);
+  letter-spacing: var(--sc-lettres-titre);
+  margin-bottom: var(--sc-e-2);
+}
+
+/* La petite mention en capitales espacées : lieu, tour, section. Discrète par
+   construction — elle informe, elle ne crie pas. */
+.mention {
+  font-size: var(--sc-t-micro);
+  font-weight: var(--sc-graisse-forte);
+  letter-spacing: var(--sc-lettres-capitales);
+  text-transform: uppercase;
+  color: var(--sc-texte-doux);
+}
+
+.chapo {
+  color: var(--sc-texte-doux);
+  margin-bottom: var(--sc-e-5);
+}
+
+/* Le filet qui sépare deux sections. Une règle horizontale, pas un fond gris. */
+.filet {
+  height: var(--sc-trait-tenu-epaisseur);
+  background: var(--sc-trait-tenu);
+  border: 0;
+  margin: var(--sc-e-5) 0;
+}
+
+.section { margin-top: var(--sc-e-6); }
+
+.section__titre {
+  font-family: var(--sc-police-titre);
+  font-size: var(--sc-t-grand);
+  line-height: var(--sc-interligne-serre);
+  margin-bottom: var(--sc-e-3);
+}
+
+/* ============================================================================
+   4. BOUTONS
+   ----------------------------------------------------------------------------
+   Trois formes seulement :
+     .bouton            — l'ordinaire, cerné d'un filet
+     .bouton--action    — l'action principale de l'écran, en aplat d'ombre
+     .bouton--geant     — « Tirer un nom », et rien d'autre
+   ============================================================================ */
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sc-e-2);
+
+  min-height: var(--sc-cible-min);
+  padding: var(--sc-e-3) var(--sc-e-5);
+
+  font-family: inherit;
+  font-size: var(--sc-t-moyen);
+  font-weight: var(--sc-graisse-forte);
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+
+  color: var(--sc-texte);
+  background: transparent;
+  border: var(--sc-trait-epaisseur) solid var(--sc-trait);
+  border-radius: var(--sc-arrondi);
+  cursor: pointer;
+
+  transition: transform var(--sc-duree-instant) var(--sc-courbe);
+}
+
+.bouton:active { transform: translateY(1px); }
+
+.bouton[disabled],
+.bouton[aria-disabled='true'] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.bouton--action {
+  background: var(--sc-action);
+  border-color: var(--sc-action);
+  color: var(--sc-action-texte);
+}
+
+.bouton--geant {
+  width: 100%;
+  min-height: var(--sc-cible-large);
+  padding: var(--sc-e-5);
+  font-family: var(--sc-police-titre);
+  font-size: var(--sc-t-grand);
+  font-weight: var(--sc-graisse-titre);
+  background: var(--sc-action);
+  border-color: var(--sc-action);
+  color: var(--sc-action-texte);
+}
+
+/* Le bouton discret : « annuler le dernier tirage », « retour ». Un filet ténu
+   et rien de plus — il existe sans réclamer l'attention. */
+.bouton--discret {
+  min-height: var(--sc-cible-min);
+  padding: var(--sc-e-2) var(--sc-e-4);
+  font-size: var(--sc-t-base);
+  font-weight: var(--sc-graisse-normale);
+  color: var(--sc-texte-doux);
+  border-color: var(--sc-trait-tenu);
+  border-width: var(--sc-trait-tenu-epaisseur);
+}
+
+.bouton--pleine-largeur { width: 100%; }
+
+/* Une pile de boutons, espacés du rythme de base. */
+.boutons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sc-e-3);
+  margin-top: var(--sc-e-5);
+}
+
+.boutons--cote-a-cote {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.boutons--cote-a-cote > * { flex: 1 1 40%; }
+
+/* ============================================================================
+   5. CHAMPS DE SAISIE
+   ============================================================================ */
+
+.champ-groupe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sc-e-2);
+  margin-bottom: var(--sc-e-4);
+}
+
+.champ-libelle {
+  font-size: var(--sc-t-petit);
+  font-weight: var(--sc-graisse-forte);
+  color: var(--sc-texte-doux);
+}
+
+.champ {
+  width: 100%;
+  min-height: var(--sc-cible-min);
+  padding: var(--sc-e-3) var(--sc-e-4);
+
+  font-family: inherit;
+  /* 16px minimum : en dessous, iOS zoome automatiquement au moment de la
+     saisie, ce qui décale toute la page. */
+  font-size: var(--sc-t-base);
+
+  color: var(--sc-texte);
+  background: var(--sc-fond);
+  border: var(--sc-trait-epaisseur) solid var(--sc-trait);
+  border-radius: var(--sc-arrondi);
+}
+
+.champ::placeholder { color: var(--sc-texte-doux); opacity: 0.6; }
+
+/* Le champ du code de tournoi : on le dicte, on le tape en majuscules, il doit
+   être immense et parfaitement lisible. */
+.champ--code {
+  font-family: var(--sc-police-chiffres);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  font-size: var(--sc-t-titre);
+  font-weight: var(--sc-graisse-titre);
+  text-align: center;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  padding-left: 0.24em;          /* compense l'espacement sur le dernier signe */
+}
+
+.champ-erreur {
+  font-size: var(--sc-t-petit);
+  color: var(--sc-texte-doux);
+  font-weight: var(--sc-graisse-forte);
+}
+
+/* Une saisie avec son bouton à droite : « nom du joueur » + « Ajouter ». */
+.saisie-ligne {
+  display: flex;
+  gap: var(--sc-e-2);
+  align-items: stretch;
+}
+.saisie-ligne .champ { flex: 1 1 auto; }
+.saisie-ligne .bouton { flex: none; padding-inline: var(--sc-e-4); }
+
+/* ============================================================================
+   6. LISTES ET LIGNES
+   ----------------------------------------------------------------------------
+   Une liste, c'est une suite de lignes séparées par un filet — comme une
+   feuille de match. Pas des cartes.
+   ============================================================================ */
+
+.liste {
+  border-top: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+}
+
+.ligne {
+  display: flex;
+  align-items: center;
+  gap: var(--sc-e-3);
+  min-height: var(--sc-cible-min);
+  padding: var(--sc-e-3) 0;
+  border-bottom: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+}
+
+.ligne__principal {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--sc-t-moyen);
+}
+
+.ligne__secondaire {
+  font-size: var(--sc-t-petit);
+  color: var(--sc-texte-doux);
+}
+
+/* Le numéro d'ordre en tête de ligne : discret, en chasse fixe pour que la
+   colonne reste droite. */
+.ligne__numero {
+  flex: none;
+  width: 2.2em;
+  font-size: var(--sc-t-petit);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  color: var(--sc-texte-doux);
+}
+
+.ligne__actions {
+  display: flex;
+  gap: var(--sc-e-2);
+  flex: none;
+}
+
+/* Petit bouton carré d'action sur une ligne (modifier, supprimer). */
+.bouton-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sc-cible-min);
+  height: var(--sc-cible-min);
+  font-family: inherit;
+  font-size: var(--sc-t-base);
+  color: var(--sc-texte-doux);
+  background: transparent;
+  border: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+  border-radius: var(--sc-arrondi);
+  cursor: pointer;
+}
+
+/* Le compteur en direct : « 9 joueurs ». Gros chiffre, petit mot. */
+.compteur {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sc-e-2);
+}
+.compteur__nombre {
+  font-family: var(--sc-police-chiffres);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  font-size: var(--sc-t-geant);
+  font-weight: var(--sc-graisse-titre);
+  line-height: 1;
+}
+.compteur__libelle {
+  font-size: var(--sc-t-petit);
+  color: var(--sc-texte-doux);
+}
+
+/* L'état vide : pas d'illustration, pas de point d'exclamation. Une phrase. */
+.vide {
+  padding: var(--sc-e-6) 0;
+  color: var(--sc-texte-doux);
+  text-align: center;
+}
+
+/* ============================================================================
+   7. CADRES — les matchs
+   ----------------------------------------------------------------------------
+   Un match est un bloc cerné d'un filet, avec deux lignes d'équipes. Le
+   vainqueur est signalé par un aplat d'argile et par sa graisse — jamais par
+   la couleur seule.
+
+   RAPPEL : l'argile ne porte que du GRAND texte (≥ 24 px, ou ≥ 18,66 px gras).
+   Son contraste est de 4,49:1, juste sous le seuil du texte courant.
+   ============================================================================ */
+
+.cadre {
+  border: var(--sc-trait-epaisseur) solid var(--sc-trait);
+  border-radius: var(--sc-arrondi);
+  margin-bottom: var(--sc-e-3);
+  overflow: hidden;
+}
+
+.cadre__entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sc-e-2);
+  padding: var(--sc-e-2) var(--sc-e-3);
+  background: var(--sc-fond-inverse);
+  color: var(--sc-texte-inverse);
+  font-size: var(--sc-t-micro);
+  font-weight: var(--sc-graisse-forte);
+  letter-spacing: var(--sc-lettres-capitales);
+  text-transform: uppercase;
+}
+
+.equipe {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sc-e-3);
+  min-height: var(--sc-cible-min);
+  padding: var(--sc-e-3);
+}
+
+.equipe + .equipe {
+  border-top: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+}
+
+.equipe__nom {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* 18,66 px gras = seuil du « grand texte » WCAG. On est à 20 px gras quand
+     l'équipe gagne, donc au-dessus du seuil sur fond d'argile. */
+  font-size: var(--sc-t-moyen);
+}
+
+.equipe__score {
+  flex: none;
+  font-family: var(--sc-police-chiffres);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  font-size: var(--sc-t-moyen);
+  font-weight: var(--sc-graisse-forte);
+  letter-spacing: 0.08em;
+}
+
+.equipe--gagnante {
+  background: var(--sc-signal);
+  color: var(--sc-signal-texte);
+}
+.equipe--gagnante .equipe__nom,
+.equipe--gagnante .equipe__score {
+  font-weight: var(--sc-graisse-titre);
+}
+
+/* Une place encore inconnue : « vainqueur de… ». */
+.equipe--attente .equipe__nom {
+  color: var(--sc-texte-doux);
+  font-size: var(--sc-t-base);
+  font-style: italic;
+}
+
+/* Le bandeau « exempte » d'un bye. */
+.cadre--bye .cadre__entete { background: var(--sc-action); }
+
+/* ============================================================================
+   8. ONGLETS — Principal / Consolante, et la navigation entre les tours
+   ============================================================================ */
+
+.onglets {
+  display: flex;
+  gap: 0;
+  border-bottom: var(--sc-trait-epaisseur) solid var(--sc-trait);
+  margin-bottom: var(--sc-e-5);
+}
+
+.onglet {
+  flex: 1 1 0;
+  min-height: var(--sc-cible-min);
+  padding: var(--sc-e-3) var(--sc-e-2);
+
+  font-family: inherit;
+  font-size: var(--sc-t-petit);
+  font-weight: var(--sc-graisse-forte);
+  letter-spacing: 0.04em;
+
+  color: var(--sc-texte-doux);
+  background: transparent;
+  border: 0;
+  border-bottom: 4px solid transparent;
+  margin-bottom: calc(-1 * var(--sc-trait-epaisseur));
+  cursor: pointer;
+}
+
+.onglet[aria-selected='true'] {
+  color: var(--sc-texte);
+  border-bottom-color: var(--sc-action);
+}
+
+/* La navigation tour par tour. Choix assumé : PAS de défilement horizontal du
+   bracket. À 380 px de large, une arborescence classique devient illisible dès
+   le deuxième tour ; un tour à la fois, en pleine largeur, se lit debout. */
+.tours {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sc-e-3);
+  margin-bottom: var(--sc-e-4);
+}
+
+.tours__nom {
+  flex: 1 1 auto;
+  text-align: center;
+  font-family: var(--sc-police-titre);
+  font-size: var(--sc-t-grand);
+  line-height: var(--sc-interligne-serre);
+}
+
+.tours__fleche {
+  flex: none;
+  width: var(--sc-cible-min);
+  height: var(--sc-cible-min);
+  font-size: var(--sc-t-grand);
+  color: var(--sc-texte);
+  background: transparent;
+  border: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+  border-radius: var(--sc-arrondi);
+  cursor: pointer;
+}
+.tours__fleche[disabled] { opacity: 0.3; cursor: not-allowed; }
+
+/* ============================================================================
+   9. NAVIGATION DU BAS
+   ----------------------------------------------------------------------------
+   Au pouce, toujours accessible, jamais dans le chemin du contenu.
+   ============================================================================ */
+
+.nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+
+  display: flex;
+  background: var(--sc-fond-inverse);
+  padding-bottom: var(--sc-marge-bas);
+}
+
+.nav[hidden] { display: none; }
+
+.nav__lien {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: var(--sc-cible-min);
+  padding: var(--sc-e-2) 2px;
+
+  font-size: var(--sc-t-micro);
+  font-weight: var(--sc-graisse-forte);
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-decoration: none;
+
+  color: var(--sc-texte-inverse);
+  border-top: 4px solid transparent;
+}
+
+.nav__lien[aria-current='page'] {
+  border-top-color: var(--sc-signal);
+}
+
+/* ============================================================================
+   10. UTILITAIRES
+   ============================================================================ */
+
+/* Une pile verticale au rythme de base. */
+.pile { display: flex; flex-direction: column; gap: var(--sc-e-4); }
+.pile--serre { gap: var(--sc-e-2); }
+.pile--large { gap: var(--sc-e-6); }
+
+.entre-deux {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sc-e-3);
+}
+
+.centre { text-align: center; }
+
+/* Réservé aux lecteurs d'écran : présent dans la page, invisible à l'œil. */
+.pour-lecteur {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Le code du tournoi affiché en grand sur l'accueil : c'est lui qu'on dicte. */
+.code-geant {
+  font-family: var(--sc-police-chiffres);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  font-size: var(--sc-t-geant);
+  font-weight: var(--sc-graisse-titre);
+  letter-spacing: 0.16em;
+  line-height: 1;
+  padding-left: 0.16em;
+}
+
+/* Un bloc en aplat d'ombre, pour isoler une information importante. */
+.encart {
+  padding: var(--sc-e-4);
+  background: var(--sc-fond-inverse);
+  color: var(--sc-texte-inverse);
+  border-radius: var(--sc-arrondi);
+}
+
+.encart--signal {
+  background: var(--sc-signal);
+  color: var(--sc-signal-texte);
+}
+
+/* ----------------------------------------------------------------------------
+   Écrans larges : on ne laisse pas les lignes s'étirer. L'app reste une
+   colonne, simplement centrée — c'est le même outil, pas une version « bureau ».
+   ---------------------------------------------------------------------------- */
+@media (min-width: 700px) {
+  .contenu { padding-top: var(--sc-e-6); }
+  .nav { justify-content: center; }
+  .nav__lien { flex: 0 1 9rem; }
+}

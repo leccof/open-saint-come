@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+
+  <!-- viewport-fit=cover : la page s'étend sous l'encoche et la barre du bas
+       des iPhone ; le CSS remet les marges là où il faut. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <title>Open de Saint-Côme</title>
+  <meta name="description" content="Concours de pétanque en doublette — Saint-Côme-d'Olt, 15 août.">
+
+  <!-- Couleur de la barre du navigateur sur mobile : le basalte du bandeau. -->
+  <meta name="theme-color" content="#34454c">
+
+  <!-- Permet d'ajouter l'app à l'écran d'accueil d'un iPhone. -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Saint-Côme">
+
+  <!-- Tous les chemins sont RELATIFS (./). Le site vit dans un sous-dossier sur
+       GitHub Pages : un chemin commençant par / chercherait à la racine du
+       domaine et donnerait une page blanche. -->
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/app.css">
+</head>
+
+<body>
+
+  <!-- Lien d'évitement, invisible tant qu'on ne navigue pas au clavier. -->
+  <a class="saut-contenu" href="#contenu">Aller au contenu</a>
+
+  <header class="bandeau">
+    <div class="bandeau__identite">
+      <span class="bandeau__titre" id="bandeau-titre">Open de Saint-Côme</span>
+      <span class="bandeau__code" id="bandeau-code" hidden></span>
+    </div>
+
+    <!-- L'indicateur de synchronisation. Visible en permanence : sur un terrain
+         en Aveyron le réseau saute, il faut le savoir sans avoir à chercher.
+         role="status" le fait annoncer par les lecteurs d'écran quand il change. -->
+    <div class="statut statut--synchronise" id="statut" role="status" aria-live="polite">
+      <span class="statut__pastille" aria-hidden="true"></span>
+      <span class="statut__texte">Synchronisé</span>
+    </div>
+  </header>
+
+  <main class="contenu" id="contenu" tabindex="-1"></main>
+
+  <!-- Navigation du bas, affichée seulement à l'intérieur d'un tournoi. -->
+  <nav class="nav" id="nav" aria-label="Sections du tournoi" hidden></nav>
+
+  <noscript>
+    <div class="contenu">
+      <h1 class="titre-ecran">JavaScript est désactivé</h1>
+      <p>Cette application a besoin de JavaScript pour fonctionner.
+         Activez-le dans les réglages de votre navigateur, puis rechargez la page.</p>
+    </div>
+  </noscript>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
