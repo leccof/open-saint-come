@@ -1,0 +1,230 @@
+/* ============================================================================
+   theme.css — Open de Saint-Côme
+   ----------------------------------------------------------------------------
+   CE FICHIER NE CONTIENT QUE DES VARIABLES. Aucune règle de mise en page ici,
+   et réciproquement : aucune couleur en dur ailleurs dans le CSS du projet.
+   Pour changer l'identité visuelle de toute l'application, il suffit de
+   modifier les valeurs ci-dessous.
+
+   ----------------------------------------------------------------------------
+   PALETTE — Sanzo Wada, « A Dictionary of Color Combinations » (1933)
+   COMBINAISON N° 296, reprise à l'identique. Aucune valeur n'a été inventée,
+   éclaircie ni désaturée.
+
+     #f5ecc2   Sulpher Yellow      L* 93,2   crème calcaire
+     #d8a37b   Ochraceous Salmon   L* 71,4   argile rosée
+     #71502f   Pale Raw Umber      L* 37,1   terre d'ombre
+     #34454c   Slate Color         L* 27,8   basalte bleuté
+
+   L'ensemble de l'interface est composé avec ces quatre couleurs et rien
+   d'autre : ni blanc, ni gris d'appoint. Cette contrainte est volontaire, et
+   c'est elle qui donne sa cohérence à l'app.
+
+   ----------------------------------------------------------------------------
+   CONTRASTES MESURÉS (norme WCAG 2.1)
+   L'app s'utilise en plein soleil, sur un terrain : la lisibilité prime sur
+   tout le reste. Voici les seules paires autorisées, et leur usage.
+
+     basalte  sur crème    8,40:1   AAA   texte courant           ✔ partout
+     crème    sur basalte  8,40:1   AAA   bandeaux, en-têtes      ✔ partout
+     crème    sur ombre    6,11:1   AA    boutons d'action        ✔ partout
+     ombre    sur crème    6,11:1   AA    texte secondaire        ✔ partout
+     basalte  sur argile   4,49:1   AA    ⚠ GRAND TEXTE UNIQUEMENT
+     ombre    sur argile   3,27:1   AA    ⚠ GRAND TEXTE UNIQUEMENT
+
+   ⚠ RÈGLE À NE PAS ENFREINDRE : l'argile (#d8a37b) n'est JAMAIS un fond de
+   petit texte. Elle mesure 4,49:1 avec le basalte, soit un cheveu sous le
+   seuil de 4,50:1 exigé pour du texte courant. Elle est réservée aux surfaces
+   décoratives et aux gros caractères — titres, scores, nom tiré au chapeau —
+   pour lesquels le seuil n'est que de 3:1 et qui sont donc largement conformes.
+   Les tokens --sc-signal-* portent ce rappel dans leur commentaire.
+
+   Rappel des seuils : texte courant AA = 4,5:1 · AAA = 7:1
+                       grand texte (≥ 24px, ou ≥ 18,66px gras) AA = 3:1
+   ============================================================================ */
+
+:root {
+
+  /* ---------------------------------------------------------------------
+     1. LES QUATRE COULEURS BRUTES
+     Nommées d'après la matière, pas d'après leur rôle : ces variables ne
+     changent jamais. Ce sont les rôles, plus bas, qui peuvent être réassignés.
+     --------------------------------------------------------------------- */
+  --sc-calcaire: #f5ecc2;   /* Sulpher Yellow    — la pierre du causse       */
+  --sc-argile:   #d8a37b;   /* Ochraceous Salmon — la terre du terrain       */
+  --sc-ombre:    #71502f;   /* Pale Raw Umber    — le bois, le cuir          */
+  --sc-basalte:  #34454c;   /* Slate Color       — la lauze des toits        */
+
+  /* ---------------------------------------------------------------------
+     2. LES RÔLES
+     C'est ce que le reste du CSS utilise. On n'écrit jamais --sc-basalte
+     dans app.css : on écrit --sc-texte. Ainsi, réassigner une couleur ne
+     demande de toucher qu'à cette section.
+     --------------------------------------------------------------------- */
+
+  /* Fonds */
+  --sc-fond:            var(--sc-calcaire);  /* fond général de l'application */
+  --sc-fond-inverse:    var(--sc-basalte);   /* bandeaux, en-têtes, pieds     */
+
+  /* Textes */
+  --sc-texte:           var(--sc-basalte);   /* 8,40:1 sur le fond — AAA      */
+  --sc-texte-doux:      var(--sc-ombre);     /* 6,11:1 sur le fond — AA       */
+  --sc-texte-inverse:   var(--sc-calcaire);  /* 8,40:1 sur fond inverse — AAA */
+
+  /* Action principale : « Tirer un nom », « Valider le score »… */
+  --sc-action:          var(--sc-ombre);
+  --sc-action-texte:    var(--sc-calcaire);  /* 6,11:1 — AA                   */
+
+  /* Surface de signal : équipe gagnante, nom qui vient d'être tiré.
+     ⚠ GRANDS CARACTÈRES UNIQUEMENT (≥ 24px, ou ≥ 18,66px en gras).           */
+  --sc-signal:          var(--sc-argile);
+  --sc-signal-texte:    var(--sc-basalte);   /* 4,49:1 — AA en grand seulement */
+
+  /* Traits et séparations */
+  --sc-trait:           var(--sc-ombre);     /* bordure marquée, cadres       */
+  --sc-trait-tenu:      var(--sc-argile);    /* filet discret, séparateurs    */
+  --sc-trait-epaisseur: 2px;
+  --sc-trait-tenu-epaisseur: 1px;
+
+  /* États de synchronisation.
+     La couleur ne porte JAMAIS l'information seule : chaque état est aussi
+     signalé par un texte et par une forme (pastille pleine / creuse).
+     C'est indispensable pour les daltoniens, et bien pratique en plein soleil. */
+  --sc-etat-ok:       var(--sc-calcaire);  /* synchronisé — pastille pleine   */
+  --sc-etat-attente:  var(--sc-argile);    /* en attente  — pastille pleine   */
+  --sc-etat-horsligne: transparent;        /* hors ligne  — pastille creuse,
+                                              cerclée de --sc-etat-ok         */
+
+  /* ---------------------------------------------------------------------
+     3. TYPOGRAPHIE
+     Aucune police n'est téléchargée : pas de Google Fonts, pas de CDN.
+     Deux raisons. D'abord le cahier des charges — zéro dépendance. Ensuite,
+     et surtout : sur un terrain en Aveyron le réseau saute, et une police
+     distante qui ne se charge pas, c'est une page qui saute d'un coup.
+     On s'appuie donc sur les polices déjà installées sur l'appareil.
+     --------------------------------------------------------------------- */
+
+  /* Titres : une serif à fort caractère, à forte modulation de trait.
+     Hoefler Text et Didot sont sur tous les iPhone et tous les Mac ; Georgia
+     prend le relais sur Windows, et « serif » sur Android. */
+  --sc-police-titre:
+      "Hoefler Text", Didot, "Didot LT STD", "Bodoni 72",
+      Georgia, "Times New Roman", serif;
+
+  /* Texte courant : la sans-serif du système, la plus lisible qui soit
+     puisque c'est celle que l'appareil affiche le mieux. */
+  --sc-police-texte:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+
+  /* Chiffres et scores : même famille, mais toujours en chasse fixe
+     (voir --sc-chiffres-reglage) pour que « 13 » et « 11 » aient exactement
+     la même largeur et que les colonnes de scores ne dansent pas. */
+  --sc-police-chiffres: var(--sc-police-texte);
+  --sc-chiffres-reglage: tabular-nums lining-nums;
+
+  /* Échelle typographique.
+     Le pas est d'environ 1,25 — assez large pour hiérarchiser franchement,
+     assez serré pour rester harmonieux. Tout est en rem, donc respectueux
+     du réglage de taille de texte du téléphone. */
+  --sc-t-micro:   0.75rem;   /* 12px — mentions, codes, horodatages         */
+  --sc-t-petit:   0.875rem;  /* 14px — légendes                             */
+  --sc-t-base:    1rem;      /* 16px — texte courant, minimum absolu        */
+  --sc-t-moyen:   1.25rem;   /* 20px — noms de joueurs, libellés de boutons */
+  --sc-t-grand:   1.5rem;    /* 24px — seuil du « grand texte » WCAG        */
+  --sc-t-titre:   2rem;      /* 32px — titres d'écran                       */
+  --sc-t-geant:   3rem;      /* 48px — le nom tiré au chapeau, les scores   */
+
+  --sc-graisse-normale: 400;
+  --sc-graisse-forte:   600;
+  --sc-graisse-titre:   700;
+
+  --sc-interligne-serre: 1.1;   /* titres                                   */
+  --sc-interligne:       1.5;   /* texte courant                            */
+
+  /* Interlettrage : les capitales et les petits libellés respirent mieux
+     légèrement espacés ; les titres serif, eux, se resserrent. */
+  --sc-lettres-titre:  -0.01em;
+  --sc-lettres-capitales: 0.12em;
+
+  /* ---------------------------------------------------------------------
+     4. RYTHME ET ESPACES
+     Une seule unité de base, 8px, et tout en est un multiple. C'est ce qui
+     fait qu'une interface « tombe juste » sans qu'on sache pourquoi.
+     --------------------------------------------------------------------- */
+  --sc-u:    8px;
+  --sc-e-1:  calc(var(--sc-u) * 0.5);   /*  4px */
+  --sc-e-2:  var(--sc-u);               /*  8px */
+  --sc-e-3:  calc(var(--sc-u) * 1.5);   /* 12px */
+  --sc-e-4:  calc(var(--sc-u) * 2);     /* 16px */
+  --sc-e-5:  calc(var(--sc-u) * 3);     /* 24px */
+  --sc-e-6:  calc(var(--sc-u) * 4);     /* 32px */
+  --sc-e-7:  calc(var(--sc-u) * 6);     /* 48px */
+  --sc-e-8:  calc(var(--sc-u) * 8);     /* 64px */
+
+  /* Largeur maximale du contenu. L'app est pensée pour 380px de large ;
+     sur un écran d'ordinateur, on ne laisse pas les lignes s'étirer. */
+  --sc-largeur-max: 34rem;   /* 544px */
+
+  /* ---------------------------------------------------------------------
+     5. CIBLES TACTILES
+     On vise le doigt, parfois mouillé, parfois sur un téléphone tenu d'une
+     main pendant que l'autre tient une boule. Apple recommande 44px ; on
+     prend nettement plus large.
+     --------------------------------------------------------------------- */
+  --sc-cible-min:     56px;   /* toute zone cliquable                       */
+  --sc-cible-large:   72px;   /* boutons de score, « Tirer un nom »         */
+
+  /* ---------------------------------------------------------------------
+     6. FORMES
+     Des angles très peu arrondis : on reste du côté de l'objet imprimé, pas
+     de l'interface en bulles.
+     --------------------------------------------------------------------- */
+  --sc-arrondi-net:   2px;
+  --sc-arrondi:       4px;
+  --sc-arrondi-doux:  8px;
+  --sc-arrondi-rond:  999px;   /* pastilles d'état, compteurs               */
+
+  /* Ombres portées : très discrètes. En plein soleil elles ne se voient pas,
+     elles ne servent donc qu'à décoller légèrement un élément actif.
+     Elles sont dérivées du basalte, jamais d'un noir pur. */
+  --sc-ombre-portee:  0 2px 6px rgba(52, 69, 76, 0.18);
+  --sc-ombre-levee:   0 6px 18px rgba(52, 69, 76, 0.26);
+
+  /* ---------------------------------------------------------------------
+     7. MOUVEMENT
+     Une seule animation compte vraiment : le défilement des noms au chapeau.
+     Le reste doit être bref, presque imperceptible.
+     --------------------------------------------------------------------- */
+  --sc-duree-instant: 90ms;
+  --sc-duree-courte:  180ms;
+  --sc-duree-tirage:  1500ms;   /* la durée du tirage d'un nom              */
+  --sc-courbe:        cubic-bezier(0.2, 0, 0.2, 1);
+  --sc-courbe-freinage: cubic-bezier(0.12, 0.7, 0.1, 1);  /* décélération
+                                   du rouleau de noms, façon roue qui ralentit */
+
+  /* Zones sûres des iPhone (encoche et barre du bas). */
+  --sc-marge-haut: env(safe-area-inset-top, 0px);
+  --sc-marge-bas:  env(safe-area-inset-bottom, 0px);
+}
+
+/* ----------------------------------------------------------------------------
+   ACCESSIBILITÉ — mouvement réduit
+   Si la personne a activé « Réduire les animations » dans les réglages de son
+   téléphone, on coupe tout, y compris le tirage : le nom apparaît directement.
+   ---------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sc-duree-instant: 0ms;
+    --sc-duree-courte:  0ms;
+    --sc-duree-tirage:  0ms;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   PAS DE MODE SOMBRE — et c'est un choix, pas un oubli.
+   Le concours se joue de jour, dehors. Un thème sombre serait moins lisible
+   au soleil qu'un fond clair, et la combinaison n° 296 n'a pas de variante
+   nocturne authentique. On force donc le rendu clair.
+   ---------------------------------------------------------------------------- */
+:root { color-scheme: light; }

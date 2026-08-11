@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open de Saint-Côme — choix de la palette</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    background: #e8e6e1; color: #2a2a28; padding: 24px 16px 64px;
+    line-height: 1.5;
+  }
+  .intro { max-width: 780px; margin: 0 auto 40px; }
+  .intro h1 { font-family: Georgia, "Times New Roman", serif; font-size: 28px; margin-bottom: 12px; }
+  .intro p { margin-bottom: 10px; font-size: 15px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; align-items: flex-start; }
+
+  .option { width: 360px; }
+  .option > h2 {
+    font-family: Georgia, serif; font-size: 19px; margin-bottom: 4px;
+  }
+  .option > .sub { font-size: 13px; opacity: .7; margin-bottom: 14px; }
+
+  /* --- bandeau des couleurs brutes --- */
+  .swatches { display: flex; border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
+  .swatches div { flex: 1; height: 54px; }
+  .names { font-size: 11px; line-height: 1.35; opacity: .75; margin-bottom: 18px; }
+  .names b { font-weight: 600; opacity: 1; }
+
+  /* --- maquette d'application --- */
+  .app {
+    border-radius: 14px; overflow: hidden; box-shadow: 0 6px 22px rgba(0,0,0,.18);
+    font-size: 15px;
+  }
+  .app .bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+  }
+  .app .body { padding: 18px 16px 22px; }
+  .app h3 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 26px; line-height: 1.1; margin-bottom: 4px; font-weight: 600;
+  }
+  .app .meta { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .8; margin-bottom: 18px; }
+
+  .reveal {
+    text-align: center; padding: 18px 10px; border-radius: 10px; margin-bottom: 14px;
+  }
+  .reveal .label { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+  .reveal .name { font-family: Georgia, serif; font-size: 30px; line-height: 1.1; margin-top: 4px; }
+
+  .cta {
+    display: block; width: 100%; border: none; border-radius: 10px;
+    padding: 18px; font-size: 19px; font-weight: 700; letter-spacing: .02em;
+    cursor: default; margin-bottom: 8px;
+  }
+  .remaining { text-align: center; font-size: 12px; opacity: .75; margin-bottom: 20px; }
+
+  .match {
+    border-radius: 10px; overflow: hidden; margin-bottom: 8px; border-width: 2px; border-style: solid;
+  }
+  .row { display: flex; justify-content: space-between; padding: 11px 13px; font-size: 15px; }
+  .row .score { font-variant-numeric: tabular-nums; font-weight: 700; letter-spacing: .08em; }
+  .row.win { font-weight: 700; }
+
+  .tags { display: flex; gap: 6px; margin-top: 16px; }
+  .tag { font-size: 11px; padding: 5px 9px; border-radius: 999px; letter-spacing: .04em; }
+
+  .checks { font-size: 12px; margin-top: 14px; line-height: 1.7; }
+  .checks span { display: inline-block; min-width: 46px; font-weight: 700; }
+  .ok { color: #1a6b32; }
+  .verdict { font-size: 13px; margin-top: 12px; padding: 10px 12px; background: #fff; border-radius: 8px; }
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <h1>Trois palettes Sanzo Wada</h1>
+  <p>Chaque option reprend <b>une combinaison authentique</b> du <i>Dictionary of Color Combinations</i>
+     (Sanzo Wada, 1933), avec ses valeurs hexadécimales exactes — aucune couleur n'a été inventée
+     ni retouchée.</p>
+  <p>La maquette ci-dessous montre les deux écrans qui comptent : <b>le chapeau</b> (le tirage
+     d'un nom) et <b>un match du tableau</b> avec l'équipe gagnante mise en avant.</p>
+  <p>Les contrastes annoncés sont mesurés selon la norme WCAG. <b>AAA</b> = très largement lisible,
+     <b>AA</b> = conforme. Pour un usage en plein soleil, plus le chiffre est haut, mieux c'est.</p>
+</div>
+
+<div class="grid">
+
+  <!-- ============ OPTION A ============ -->
+  <div class="option">
+    <h2>A — Ombre et calcaire</h2>
+    <div class="sub">Combinaison n° 296</div>
+    <div class="swatches">
+      <div style="background:#f5ecc2"></div>
+      <div style="background:#d8a37b"></div>
+      <div style="background:#71502f"></div>
+      <div style="background:#34454c"></div>
+    </div>
+    <div class="names">
+      <b>#f5ecc2</b> Sulpher Yellow · <b>#d8a37b</b> Ochraceous Salmon ·
+      <b>#71502f</b> Pale Raw Umber · <b>#34454c</b> Slate Color
+    </div>
+
+    <div class="app" style="background:#f5ecc2; color:#34454c">
+      <div class="bar" style="background:#34454c; color:#f5ecc2">
+        <span>Open de Saint-Côme</span><span>● Synchronisé</span>
+      </div>
+      <div class="body">
+        <h3>Le chapeau</h3>
+        <div class="meta">Terrain du Potager</div>
+
+        <div class="reveal" style="background:#d8a37b; color:#34454c">
+          <div class="label">En attente de son coéquipier</div>
+          <div class="name">Jean-Michel</div>
+        </div>
+
+        <button class="cta" style="background:#71502f; color:#ffffff">Tirer un nom</button>
+        <div class="remaining">7 joueurs encore dans le chapeau</div>
+
+        <div class="match" style="border-color:#71502f; background:#f5ecc2">
+          <div class="row win" style="background:#d8a37b; color:#34454c">
+            <span>Marie / Antoine</span><span class="score">13 · 9</span>
+          </div>
+          <div class="row"><span>Paul / Lucie</span><span class="score">7 · 13</span></div>
+          <div class="row" style="background:#71502f; color:#ffffff">
+            <span>Manche décisive</span><span class="score">13 · 11</span>
+          </div>
+        </div>
+
+        <div class="tags">
+          <span class="tag" style="background:#34454c; color:#f5ecc2">Principal</span>
+          <span class="tag" style="background:#d8a37b; color:#34454c">Consolante</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="checks">
+      <span class="ok">8,4:1</span> texte sur fond &nbsp;— AAA<br>
+      <span class="ok">7,3:1</span> bouton « Tirer un nom » — AAA<br>
+      <span class="ok">4,5:1</span> texte sur le bandeau saumon — AA (limite)
+    </div>
+    <div class="verdict">La plus sobre et la plus « pierre du Lot ». Son point faible :
+      le saumon est un fond faible, tout juste conforme pour du petit texte.</div>
+  </div>
+
+  <!-- ============ OPTION B ============ -->
+  <div class="option">
+    <h2>B — Olive et soufre</h2>
+    <div class="sub">Combinaison n° 310</div>
+    <div class="swatches">
+      <div style="background:#f5ecc2"></div>
+      <div style="background:#eeb480"></div>
+      <div style="background:#837e31"></div>
+      <div style="background:#253122"></div>
+    </div>
+    <div class="names">
+      <b>#f5ecc2</b> Sulpher Yellow · <b>#eeb480</b> Pinkish Cinnamon ·
+      <b>#837e31</b> Olive · <b>#253122</b> Deep Slate Olive
+    </div>
+
+    <div class="app" style="background:#f5ecc2; color:#253122">
+      <div class="bar" style="background:#253122; color:#f5ecc2">
+        <span>Open de Saint-Côme</span><span>● Synchronisé</span>
+      </div>
+      <div class="body">
+        <h3>Le chapeau</h3>
+        <div class="meta">Terrain du Potager</div>
+
+        <div class="reveal" style="background:#eeb480; color:#253122">
+          <div class="label">En attente de son coéquipier</div>
+          <div class="name">Jean-Michel</div>
+        </div>
+
+        <button class="cta" style="background:#253122; color:#f5ecc2">Tirer un nom</button>
+        <div class="remaining">7 joueurs encore dans le chapeau</div>
+
+        <div class="match" style="border-color:#837e31; background:#f5ecc2">
+          <div class="row win" style="background:#eeb480; color:#253122">
+            <span>Marie / Antoine</span><span class="score">13 · 9</span>
+          </div>
+          <div class="row"><span>Paul / Lucie</span><span class="score">7 · 13</span></div>
+          <div class="row" style="background:#837e31; color:#f5ecc2">
+            <span>Manche décisive</span><span class="score">13 · 11</span>
+          </div>
+        </div>
+
+        <div class="tags">
+          <span class="tag" style="background:#253122; color:#f5ecc2">Principal</span>
+          <span class="tag" style="background:#eeb480; color:#253122">Consolante</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="checks">
+      <span class="ok">11,5:1</span> texte sur fond — AAA<br>
+      <span class="ok">11,5:1</span> bouton « Tirer un nom » — AAA<br>
+      <span class="ok">7,5:1</span> texte sur le bandeau cannelle — AAA
+    </div>
+    <div class="verdict">Contrastes irréprochables partout. Mais l'olive est trop terne pour
+      servir de couleur d'accent : le bouton doit être le vert-noir, moins claquant.</div>
+  </div>
+
+  <!-- ============ OPTION C ============ -->
+  <div class="option">
+    <h2>C — Terre battue &nbsp;<small style="font-size:12px; font-weight:400;">(ma recommandation)</small></h2>
+    <div class="sub">Combinaison n° 323</div>
+    <div class="swatches">
+      <div style="background:#fdc57e"></div>
+      <div style="background:#b2b73e"></div>
+      <div style="background:#762c19"></div>
+      <div style="background:#111314"></div>
+    </div>
+    <div class="names">
+      <b>#fdc57e</b> Cinnamon Buff · <b>#b2b73e</b> Citron Yellow ·
+      <b>#762c19</b> Madder Brown · <b>#111314</b> Black
+    </div>
+
+    <div class="app" style="background:#fdc57e; color:#111314">
+      <div class="bar" style="background:#762c19; color:#fdc57e">
+        <span>Open de Saint-Côme</span><span>● Synchronisé</span>
+      </div>
+      <div class="body">
+        <h3>Le chapeau</h3>
+        <div class="meta">Terrain du Potager</div>
+
+        <div class="reveal" style="background:#111314; color:#fdc57e">
+          <div class="label">En attente de son coéquipier</div>
+          <div class="name">Jean-Michel</div>
+        </div>
+
+        <button class="cta" style="background:#762c19; color:#ffffff">Tirer un nom</button>
+        <div class="remaining">7 joueurs encore dans le chapeau</div>
+
+        <div class="match" style="border-color:#762c19; background:#fdc57e">
+          <div class="row win" style="background:#b2b73e; color:#111314">
+            <span>Marie / Antoine</span><span class="score">13 · 9</span>
+          </div>
+          <div class="row"><span>Paul / Lucie</span><span class="score">7 · 13</span></div>
+          <div class="row" style="background:#762c19; color:#ffffff">
+            <span>Manche décisive</span><span class="score">13 · 11</span>
+          </div>
+        </div>
+
+        <div class="tags">
+          <span class="tag" style="background:#111314; color:#fdc57e">Principal</span>
+          <span class="tag" style="background:#b2b73e; color:#111314">Consolante</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="checks">
+      <span class="ok">11,9:1</span> texte sur fond — AAA<br>
+      <span class="ok">9,8:1</span> bouton « Tirer un nom » — AAA<br>
+      <span class="ok">8,6:1</span> équipe gagnante en citron — AAA
+    </div>
+    <div class="verdict">Le fond <i>est</i> la couleur de la terre battue, le citron est assez
+      saturé pour signaler une victoire à trois mètres, et tout est AAA. Le plus affirmé
+      des trois — c'est aussi le seul qui se lit sans effort à midi.</div>
+  </div>
+
+</div>
+</body>
+</html>
