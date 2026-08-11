@@ -183,6 +183,28 @@ https://leccof.github.io/open-saint-come/
 
 ---
 
+## 5 bis. La fiche à imprimer
+
+`design/fiche.pdf` est une feuille A4 à scotcher sur la table de marque : le
+QR code du tournoi, le code à six caractères, et les trois étapes pour
+rejoindre. Scanner le QR ouvre le tournoi directement, sans rien saisir.
+
+Pour la refaire avec un autre tournoi :
+
+```bash
+python3 design/fiche.py ABC123      # ou sans code : cases vides à remplir au feutre
+cd design
+CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+"$CHROME" --headless=new --no-pdf-header-footer --print-to-pdf=fiche.pdf "file://$PWD/fiche.html"
+```
+
+> `design/qr.py` et `design/fiche.py` sont des **outils de conception**. Rien
+> de tout cela ne part dans le navigateur : l'application reste sans aucune
+> dépendance. L'encodeur QR a été écrit d'après la norme ISO 18004 et vérifié
+> en relisant les codes produits avec le décodeur du système.
+
+---
+
 ## 6. Utiliser l'application le jour du tournoi
 
 1. **Créer le tournoi** depuis l'accueil. L'app génère un **code à 6 caractères**
