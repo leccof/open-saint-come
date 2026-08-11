@@ -306,6 +306,32 @@ export function definirPhase(etat, phase) {
 }
 
 /* ----------------------------------------------------------------------------
+   LE CHAPEAU
+   ---------------------------------------------------------------------------- */
+
+/**
+ * Arme le chapeau : tous les joueurs y entrent, aucune équipe n'existe encore.
+ *
+ * À partir d'ici la liste des joueurs est close — on ne peut plus en ajouter
+ * ni en retirer. C'est volontaire : modifier l'effectif au milieu d'un tirage
+ * rendrait le résultat contestable, et sur un tirage public c'est le genre de
+ * chose qui se discute longtemps.
+ */
+export function demarrerTirage(etat) {
+  if (!peutTirer(etat)) return etat;
+  const suivant = clonerEtat(etat);
+  suivant.draw = {
+    status: 'encours',
+    remaining: suivant.players.map((j) => j.id),
+    order: [],
+    pending: null,
+  };
+  suivant.teams = [];
+  suivant.phase = 'tirage';
+  return suivant;
+}
+
+/* ----------------------------------------------------------------------------
    LE MATCH EN COURS
    ----------------------------------------------------------------------------
    Il n'y a qu'un seul terrain. Ce n'est donc pas un détail cosmétique : savoir

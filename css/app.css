@@ -674,6 +674,10 @@ body.a-navigation .contenu {
 
 .centre { text-align: center; }
 
+/* Un lien qui ne se signale pas comme tel : c'est la ligne entière qui est
+   cliquable, le soulignement n'apporterait que du bruit. */
+.lien-nu { color: inherit; text-decoration: none; }
+
 /* Réservé aux lecteurs d'écran : présent dans la page, invisible à l'œil. */
 .pour-lecteur {
   position: absolute;
@@ -695,17 +699,53 @@ body.a-navigation .contenu {
   padding-left: 0.16em;
 }
 
-/* Un bloc en aplat d'ombre, pour isoler une information importante. */
+/* ----------------------------------------------------------------------------
+   LES ENCARTS
+   ----------------------------------------------------------------------------
+   Deux niveaux, et la différence se joue sur le TRAIT contre l'APLAT, jamais
+   sur une couleur d'alerte :
+
+     .encart          une remarque — un simple cadre, ton normal
+     .encart--signal  une décision à prendre — un aplat, on ne peut pas l'ignorer
+
+   L'aplat est en BASALTE, pas en argile. C'est délibéré : l'argile ne mesure
+   que 4,49:1 avec le texte, soit juste sous le seuil AA du texte courant. Elle
+   n'apparaît donc ici qu'en filet supérieur — une couleur qui signale, sur
+   laquelle rien ne se lit.
+   ---------------------------------------------------------------------------- */
+
 .encart {
+  margin-top: var(--sc-e-4);
   padding: var(--sc-e-4);
-  background: var(--sc-fond-inverse);
-  color: var(--sc-texte-inverse);
+  background: var(--sc-fond);
+  color: var(--sc-texte);
+  border: var(--sc-trait-epaisseur) solid var(--sc-trait);
   border-radius: var(--sc-arrondi);
 }
 
 .encart--signal {
-  background: var(--sc-signal);
-  color: var(--sc-signal-texte);
+  background: var(--sc-fond-inverse);
+  color: var(--sc-texte-inverse);
+  border-color: var(--sc-fond-inverse);
+  border-top: 6px solid var(--sc-signal);
+}
+
+/* Sur l'aplat sombre, les textes secondaires doivent repasser en clair : leur
+   couleur normale (la terre d'ombre) y serait illisible, à 1,38:1. */
+.encart--signal .mention,
+.encart--signal .ligne__secondaire,
+.encart--signal .champ-erreur { color: var(--sc-texte-inverse); }
+
+/* Et les boutons s'inversent : sur fond sombre, l'action principale devient un
+   aplat clair — 8,40:1, le contraste le plus élevé de toute la palette. */
+.encart--signal .bouton {
+  color: var(--sc-texte-inverse);
+  border-color: var(--sc-texte-inverse);
+  background: transparent;
+}
+.encart--signal .bouton--action {
+  background: var(--sc-texte-inverse);
+  color: var(--sc-fond-inverse);
 }
 
 /* ----------------------------------------------------------------------------

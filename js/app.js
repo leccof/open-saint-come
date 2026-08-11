@@ -18,6 +18,9 @@
 
 import * as storage from './storage.js';
 import { h, remplir, titre, mention, chapo } from './views/dom.js';
+import * as vueAccueil from './views/accueil.js';
+import * as vueConfig from './views/config.js';
+import * as vueJoueurs from './views/joueurs.js';
 
 /* ----------------------------------------------------------------------------
    ÉLÉMENTS DE LA PAGE
@@ -175,13 +178,30 @@ function dessinerBandeau() {
    navigable.
    ---------------------------------------------------------------------------- */
 
+/* Les écrans encore à écrire. Ils annoncent leur contenu plutôt que d'afficher
+   une page blanche. */
 const ECRANS_A_VENIR = {
-  config: ['Configuration', 'Nom du tournoi, date, et effectif annoncé — modifiable tant que le tirage n’est pas lancé.'],
-  joueurs: ['Les joueurs', 'Ajout, modification, suppression. Compteur en direct et détection des doublons.'],
   chapeau: ['Le chapeau', 'Un seul bouton : « Tirer un nom ». Les joueurs sortent un par un et forment les équipes.'],
   tableaux: ['Les tableaux', 'Principal et consolante, tour par tour, avec la saisie des scores.'],
   resultats: ['Résultats', 'Les deux podiums, le détail de tous les matchs, et l’export JSON de secours.'],
 };
+
+/**
+ * Le contexte remis à chaque écran. C'est tout ce qu'une vue a le droit de
+ * connaître du reste de l'application : l'état, comment le modifier, comment
+ * naviguer, comment se redessiner.
+ */
+function contexte() {
+  return {
+    etat,
+    majEtat,
+    allerA,
+    /* rafraichir() redessine SANS enregistrer : pour les changements purement
+       visuels (ouvrir un champ, afficher un message) qui n'ont rien à faire
+       dans la base de données. */
+    rafraichir: dessiner,
+  };
+}
 
 function dessiner() {
   dessinerBandeau();
@@ -190,16 +210,12 @@ function dessiner() {
   if (route.nom === 'regles') {
     remplir(elContenu,
       titre('Règles'),
-      chapo('La page des règles arrive à l’étape suivante.'));
+      chapo('La page des règles arrive à une étape suivante.'));
     return;
   }
 
   if (route.nom === 'accueil') {
-    remplir(elContenu,
-      mention('Saint-Côme-d’Olt · 15 août'),
-      titre('Open de Saint-Côme'),
-      chapo('Créer un tournoi, ou en rejoindre un avec son code à 6 caractères.'),
-      h('p', { class: 'vide' }, 'L’accueil arrive à l’étape suivante.'));
+    remplir(elContenu, vueAccueil.rendre(contexte()));
     return;
   }
 
@@ -210,11 +226,23 @@ function dessiner() {
     return;
   }
 
-  const [nom, description] = ECRANS_A_VENIR[route.section] || ECRANS_A_VENIR.joueurs;
-  remplir(elContenu,
-    mention(etat.config?.venue || ''),
-    titre(nom),
-    chapo(description));
+  const ctx = contexte();
+
+  switch (route.section) {
+    case 'config':
+      remplir(elContenu, vueConfig.rendre(ctx));
+      return;
+    case 'joueurs':
+      remplir(elContenu, vueJoueurs.rendre(ctx));
+      return;
+    default: {
+      const [nom, description] = ECRANS_A_VENIR[route.section] || ECRANS_A_VENIR.tableaux;
+      remplir(elContenu,
+        mention(etat.config?.venue || ''),
+        titre(nom),
+        chapo(description));
+    }
+  }
 }
 
 /* ----------------------------------------------------------------------------
