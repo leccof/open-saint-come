@@ -1,0 +1,33 @@
+# --- Fichiers créés automatiquement par macOS ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# --- Dépendances (le projet n'en utilise aucune, mais au cas où) ---
+node_modules/
+package-lock.json
+
+# --- Fichiers des éditeurs de code ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude/
+
+# --- Journaux et fichiers temporaires ---
+*.log
+tmp/
+.cache/
+
+# NOTE IMPORTANTE : config.js n'est volontairement PAS ignoré.
+# Le site est 100 % statique : le navigateur doit pouvoir lire l'URL et la clé
+# « anon » de Supabase pour fonctionner. Cette clé est publique par nature ;
+# la sécurité repose sur les règles d'accès (RLS) configurées dans Supabase,
+# pas sur le secret de la clé.
+# En revanche, la clé « service_role » de Supabase ne doit JAMAIS apparaître
+# dans ce dépôt.
