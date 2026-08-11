@@ -548,6 +548,115 @@ body.a-navigation .contenu {
 .cadre--bye .cadre__entete { background: var(--sc-action); }
 
 /* ============================================================================
+   7 bis. LE CHAPEAU
+   ----------------------------------------------------------------------------
+   L'écran signature. Presque vide : un rouleau, un bouton, et le nom.
+
+   Le rouleau est un vrai défilement vertical, pas un clignotement de texte :
+   une piste de noms se déplace derrière une fenêtre de la hauteur d'une ligne,
+   ralentit selon une courbe de freinage — celle d'une roue qui s'arrête, pas
+   d'une temporisation logicielle — et S'ARRÊTE NET sur le nom tiré. Pas de
+   fondu, pas de rebond. Le silence qui suit fait partie de l'effet.
+   ============================================================================ */
+
+.chapeau-scene {
+  border: var(--sc-trait-epaisseur) solid var(--sc-trait);
+  border-radius: var(--sc-arrondi);
+  padding: var(--sc-e-4) var(--sc-e-3);
+  margin-bottom: var(--sc-e-5);
+  text-align: center;
+}
+
+/* La fenêtre : on ne voit qu'un cran de la piste à la fois. */
+.rouleau {
+  height: var(--sc-rouleau-hauteur);
+  overflow: hidden;
+  position: relative;
+}
+
+.rouleau__piste {
+  /* Prévient le navigateur qu'on va animer ce déplacement : il prépare la
+     couche graphique et le défilement reste fluide sur un vieux téléphone. */
+  will-change: transform;
+}
+
+.rouleau__nom {
+  height: var(--sc-rouleau-hauteur);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: var(--sc-police-titre);
+  font-size: var(--sc-t-nom-tire);
+  font-weight: var(--sc-graisse-titre);
+  line-height: 1;
+  letter-spacing: var(--sc-lettres-titre);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 var(--sc-e-2);
+}
+
+/* Le nom arrêté. L'aplat d'argile ne porte ici que ce très grand texte —
+   largement au-delà du seuil de 24 px qui l'autorise. */
+.rouleau--arrete {
+  background: var(--sc-signal);
+  color: var(--sc-signal-texte);
+  border-radius: var(--sc-arrondi);
+}
+
+.chapeau-scene__legende {
+  margin-top: var(--sc-e-3);
+  min-height: 2.4em;
+  font-size: var(--sc-t-base);
+  color: var(--sc-texte-doux);
+}
+
+/* Le message « en attente de son coéquipier » : c'est lui qui fait comprendre
+   le format à toute la table. Il ne doit pas passer inaperçu. */
+.chapeau-scene__legende strong {
+  display: block;
+  font-size: var(--sc-t-moyen);
+  font-weight: var(--sc-graisse-forte);
+  color: var(--sc-texte);
+}
+
+.chapeau-reste {
+  text-align: center;
+  margin-top: var(--sc-e-3);
+  font-size: var(--sc-t-petit);
+  color: var(--sc-texte-doux);
+}
+
+/* Une équipe formée dans la liste du dessous. */
+.equipe-formee {
+  display: flex;
+  align-items: center;
+  gap: var(--sc-e-3);
+  min-height: var(--sc-cible-min);
+  padding: var(--sc-e-3) 0;
+  border-bottom: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+}
+
+.equipe-formee__rang {
+  flex: none;
+  width: 2.4em;
+  font-family: var(--sc-police-chiffres);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  font-size: var(--sc-t-petit);
+  color: var(--sc-texte-doux);
+}
+
+.equipe-formee__nom {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--sc-t-moyen);
+}
+
+.equipe-formee--incomplete .equipe-formee__nom { color: var(--sc-texte-doux); }
+
+/* ============================================================================
    8. ONGLETS — Principal / Consolante, et la navigation entre les tours
    ============================================================================ */
 

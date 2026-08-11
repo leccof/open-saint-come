@@ -133,7 +133,13 @@
   --sc-t-moyen:   1.25rem;   /* 20px — noms de joueurs, libellés de boutons */
   --sc-t-grand:   1.5rem;    /* 24px — seuil du « grand texte » WCAG        */
   --sc-t-titre:   2rem;      /* 32px — titres d'écran                       */
-  --sc-t-geant:   3rem;      /* 48px — le nom tiré au chapeau, les scores   */
+  --sc-t-geant:   3rem;      /* 48px — les scores, les compteurs            */
+
+  /* Le nom tiré au chapeau : c'est le plus gros texte de toute l'application.
+     Il s'adapte à la largeur de l'écran, parce qu'un nom composé comme
+     « Jean-Michel » doit tenir sur une ligne sur un téléphone étroit. */
+  --sc-t-nom-tire: clamp(1.75rem, 8.5vw, 3rem);
+  --sc-rouleau-hauteur: 5rem;   /* hauteur d'un cran du rouleau de noms      */
 
   --sc-graisse-normale: 400;
   --sc-graisse-forte:   600;

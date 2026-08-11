@@ -21,6 +21,7 @@ import { h, remplir, titre, mention, chapo } from './views/dom.js';
 import * as vueAccueil from './views/accueil.js';
 import * as vueConfig from './views/config.js';
 import * as vueJoueurs from './views/joueurs.js';
+import * as vueChapeau from './views/chapeau.js';
 
 /* ----------------------------------------------------------------------------
    ÉLÉMENTS DE LA PAGE
@@ -181,7 +182,6 @@ function dessinerBandeau() {
 /* Les écrans encore à écrire. Ils annoncent leur contenu plutôt que d'afficher
    une page blanche. */
 const ECRANS_A_VENIR = {
-  chapeau: ['Le chapeau', 'Un seul bouton : « Tirer un nom ». Les joueurs sortent un par un et forment les équipes.'],
   tableaux: ['Les tableaux', 'Principal et consolante, tour par tour, avec la saisie des scores.'],
   resultats: ['Résultats', 'Les deux podiums, le détail de tous les matchs, et l’export JSON de secours.'],
 };
@@ -234,6 +234,9 @@ function dessiner() {
       return;
     case 'joueurs':
       remplir(elContenu, vueJoueurs.rendre(ctx));
+      return;
+    case 'chapeau':
+      remplir(elContenu, vueChapeau.rendre(ctx));
       return;
     default: {
       const [nom, description] = ECRANS_A_VENIR[route.section] || ECRANS_A_VENIR.tableaux;
