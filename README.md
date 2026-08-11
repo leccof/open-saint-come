@@ -215,16 +215,38 @@ Faites-le en fin de journée : c'est votre filet de sécurité.
 
 ## 7. Lancer les tests
 
-Les tests vérifient automatiquement que les tableaux se construisent correctement,
-notamment pour les nombres d'équipes qui ne tombent pas juste (3, 5, 11…).
+Les tests vérifient automatiquement les deux endroits où ce genre d'application
+casse en silence : **la construction des tableaux** (notamment quand le nombre
+d'équipes ne tombe pas juste — 3, 5, 11…) et **le tirage du chapeau**.
 
 ```bash
 cd ~/Projets/open-saint-come
-node --test tests/
+node --test
 ```
 
-Une ligne verte par test réussi. En cas d'échec, Node affiche ce qui était attendu
-et ce qui a été obtenu.
+Une ligne verte par test réussi, et un décompte à la fin. En cas d'échec, Node
+affiche ce qui était attendu et ce qui a été obtenu.
+
+> ⚠️ N'écrivez pas `node --test tests/`. Depuis Node 22, ce qui suit `--test`
+> est interprété comme un **motif de fichiers**, plus comme un dossier : la
+> commande échouerait avec « Cannot find module ». Sans rien après, Node trouve
+> tout seul les fichiers `*.test.js`. Si vous voulez être explicite :
+> `node --test tests/*.test.js`.
+
+**Ce que les 71 tests couvrent :**
+
+| Domaine | Exemples de ce qui est vérifié |
+| --- | --- |
+| Forme du tableau | 3, 5, 8, 11 et 16 équipes : bonne taille, bon nombre de tours |
+| Placement | chaque équipe placée une fois et une seule, aucun match vide |
+| Byes | bon nombre, jamais deux fois la même équipe, répartis dans les deux moitiés |
+| Progression | le vainqueur se retrouve bien au tour suivant, jusqu'à la finale |
+| Cascade | corriger un score efface la suite — et **seulement** ce qui en dépendait |
+| Scores | le vainqueur d'une manche doit être à 13 ; une 3ᵉ manche après un 2-0 est ignorée |
+| Consolante | composition, création au bon moment, détection d'incohérence |
+| Chapeau | chaque joueur sort une fois, équipes deux par deux, triplette en dernier |
+| Annulation | le nom revient dans le chapeau sans perdre personne |
+| Hasard | tirage sans biais, mélange qui ne perd ni ne duplique |
 
 ---
 

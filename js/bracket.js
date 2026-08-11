@@ -211,6 +211,12 @@ export function matchSuivant(tour, position) {
 
 /** Une manche est valide si le vainqueur est exactement à 13 et l'autre en dessous. */
 export function validerManche(a, b, points = 13) {
+  // On écarte d'abord le vide EXPLICITEMENT. Sans cette ligne, Number(null) et
+  // Number('') valent 0 : une manche dont un score n'a pas été saisi passerait
+  // pour un 13-0 parfaitement régulier.
+  const manquant = (v) => v === null || v === undefined || v === '';
+  if (manquant(a) || manquant(b)) return { ok: false, message: 'Scores incomplets.' };
+
   const na = Number(a), nb = Number(b);
   if (!Number.isInteger(na) || !Number.isInteger(nb)) return { ok: false, message: 'Scores incomplets.' };
   if (na < 0 || nb < 0) return { ok: false, message: 'Un score ne peut pas être négatif.' };
