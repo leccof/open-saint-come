@@ -723,6 +723,107 @@ body.a-navigation .contenu {
 .tours__fleche[disabled] { opacity: 0.3; cursor: not-allowed; }
 
 /* ============================================================================
+   8 bis. LA SAISIE DES SCORES
+   ----------------------------------------------------------------------------
+   Le clavier numérique est banni. Voici pourquoi c'est possible :
+
+   Une manche de pétanque s'arrête à 13. Le vainqueur EST à 13, toujours. Il n'y
+   a donc que deux informations à saisir — qui a gagné la manche, et combien
+   l'autre avait — et la seconde tient dans une grille de treize touches, de 0
+   à 12.
+
+   Deux appuis par manche, des cibles de 56 px, aucun clavier qui surgit et
+   recouvre l'écran. C'est saisissable debout, d'une main, avec les doigts
+   poussiéreux.
+   ============================================================================ */
+
+.saisie-match {
+  border-top: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+  padding: var(--sc-e-4) var(--sc-e-3);
+}
+
+.manche {
+  padding-bottom: var(--sc-e-4);
+}
+.manche + .manche {
+  border-top: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+  padding-top: var(--sc-e-4);
+}
+
+.manche__titre {
+  font-size: var(--sc-t-micro);
+  font-weight: var(--sc-graisse-forte);
+  letter-spacing: var(--sc-lettres-capitales);
+  text-transform: uppercase;
+  color: var(--sc-texte-doux);
+  margin-bottom: var(--sc-e-2);
+}
+
+.manche__question {
+  font-size: var(--sc-t-base);
+  margin-bottom: var(--sc-e-2);
+}
+
+/* Une manche déjà saisie, repliée sur une seule ligne. */
+.manche--repliee {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sc-e-3);
+  min-height: var(--sc-cible-min);
+}
+
+.manche__resume {
+  font-size: var(--sc-t-moyen);
+}
+.manche__resume b {
+  font-family: var(--sc-police-chiffres);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  letter-spacing: 0.06em;
+}
+
+/* La grille des treize touches. Cinq colonnes : c'est ce qui donne les cibles
+   les plus larges possibles sur un écran de 380 px. */
+.grille-scores {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--sc-e-2);
+}
+
+.grille-scores .bouton {
+  min-height: var(--sc-cible-min);
+  padding: var(--sc-e-2);
+  font-family: var(--sc-police-chiffres);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  font-size: var(--sc-t-moyen);
+}
+
+/* Le bandeau « sur le terrain » : il n'y a qu'un terrain, donc un seul match à
+   la fois. Cette information évite trois personnes debout à se demander qui
+   joue. */
+.terrain {
+  border: var(--sc-trait-epaisseur) solid var(--sc-trait);
+  border-left-width: 6px;
+  border-radius: var(--sc-arrondi);
+  padding: var(--sc-e-3);
+  margin-bottom: var(--sc-e-5);
+}
+
+.terrain__libelle {
+  font-size: var(--sc-t-micro);
+  font-weight: var(--sc-graisse-forte);
+  letter-spacing: var(--sc-lettres-capitales);
+  text-transform: uppercase;
+  color: var(--sc-texte-doux);
+}
+
+.terrain__match {
+  font-size: var(--sc-t-moyen);
+  font-weight: var(--sc-graisse-forte);
+  margin-top: 2px;
+}
+
+/* ============================================================================
    9. NAVIGATION DU BAS
    ----------------------------------------------------------------------------
    Au pouce, toujours accessible, jamais dans le chemin du contenu.
