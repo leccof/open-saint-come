@@ -425,7 +425,9 @@ body.a-navigation .contenu {
   flex: none;
 }
 
-/* Petit bouton carré d'action sur une ligne (modifier, supprimer). */
+/* Petit bouton carré d'action sur une ligne (modifier, supprimer).
+   Le symbole est volontairement gros et gras : un trait fin disparaît au
+   soleil, et ces deux boutons se visent du pouce sans regarder. */
 .bouton-icone {
   display: inline-flex;
   align-items: center;
@@ -433,7 +435,8 @@ body.a-navigation .contenu {
   width: var(--sc-cible-min);
   height: var(--sc-cible-min);
   font-family: inherit;
-  font-size: var(--sc-t-base);
+  font-size: var(--sc-t-moyen);
+  font-weight: var(--sc-graisse-forte);
   color: var(--sc-texte-doux);
   background: transparent;
   border: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
