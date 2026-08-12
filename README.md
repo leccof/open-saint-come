@@ -290,9 +290,16 @@ open-saint-come/
 │   ├── draw.js           Le tirage au sort du chapeau
 │   ├── bracket.js        Construction des tableaux, byes, progression
 │   ├── rules-data.js     Texte de la page Règles
+│   ├── vendor/           GSAP, la bibliothèque d'animation (voir ci-dessous)
 │   └── views/            Un fichier par écran
 └── tests/                Tests exécutés par « node --test »
 ```
+
+> **Une seule bibliothèque extérieure : GSAP** (`js/vendor/gsap.min.js`, 71 ko),
+> qui anime le lancer de boule du chapeau. Elle est **copiée dans le dépôt** et
+> servie depuis votre propre site, jamais depuis un CDN : sur un terrain sans
+> réseau, l'animation doit fonctionner comme le reste. Rien à installer, aucune
+> commande `npm`, aucune étape de build — un fichier, chargé comme les autres.
 
 Deux principes structurent le code :
 

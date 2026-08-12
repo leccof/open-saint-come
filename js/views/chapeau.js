@@ -21,7 +21,7 @@ import {
   manquePourCompleter, bandeDeNoms,
 } from '../draw.js';
 import { creerTableauPrincipal } from '../bracket.js';
-import { creerPiste, secouer, vibrer, INSTANT_IMPACT } from './lancer.js';
+import { creerPiste, secouer, claquer, vibrer } from './lancer.js';
 
 /* État éphémère de l'écran. */
 let enCoursDAnimation = false;
@@ -50,41 +50,9 @@ function dureeTirage() {
   return brut.endsWith('ms') ? ms : ms * 1000;
 }
 
-/**
- * Fait tourner le rouleau et l'arrête sur le nom voulu.
- *
- * La piste contient toute la bande de noms, le vrai en dernier. On la déplace
- * de 0 jusqu'à sa dernière position selon une courbe de décélération, ce qui
- * la fait naturellement s'immobiliser sur le bon cran — sans recalage.
- */
-function faireTourner(piste, nbCrans, hauteurCran, duree, quandFini) {
-  const distance = (nbCrans - 1) * hauteurCran;
-  const depart = performance.now();
-
-  function trame(maintenant) {
-    const p = Math.min(1, (maintenant - depart) / duree);
-
-    /* LE FREINAGE EST EN DEUX TEMPS, et c'est tout l'effet.
-
-       Avant l'impact, la roue tourne encore presque à pleine vitesse : elle a
-       parcouru un peu plus de la moitié du chemin, mais rien ne semble décidé.
-       À la SECONDE où la boule touche le sol, elle freine d'un coup et va
-       mourir sur le nom.
-
-       Une décélération régulière donnerait un compte à rebours. Ce
-       décrochement-là donne un coup joué. */
-    const freine = p < INSTANT_IMPACT
-      ? 0.58 * Math.pow(p / INSTANT_IMPACT, 0.82)
-      : 0.58 + 0.42 * (1 - Math.pow(1 - (p - INSTANT_IMPACT) / (1 - INSTANT_IMPACT), 5));
-
-    piste.style.transform = `translateY(${-freine * distance}px)`;
-
-    if (p < 1) requestAnimationFrame(trame);
-    else quandFini();
-  }
-
-  requestAnimationFrame(trame);
-}
+/* Le défilement des noms n'est plus piloté ici : il fait partie de la même
+   timeline que le lancer de boule (views/lancer.js). C'est ce qui garantit que
+   le freinage tombe exactement sur l'impact, sans deux horloges à accorder. */
 
 export function rendre(ctx) {
   const etat = ctx.etat;
@@ -160,9 +128,7 @@ export function rendre(ctx) {
     // l'écran juste après et emporterait tout élément ajouté avant.
     if (claqueEnAttente) {
       claqueEnAttente = false;
-      fenetre.classList.remove('rouleau--claque');
-      void fenetre.offsetWidth;          // force le navigateur à repartir de zéro
-      fenetre.classList.add('rouleau--claque');
+      claquer(fenetre);
     }
   }
 
@@ -209,27 +175,24 @@ export function rendre(ctx) {
           ...bande.map((n) => h('div', { class: 'rouleau__nom' }, n))
         );
 
-        // 3. Le lancer et le rouleau partent sur la même image et durent le
-        //    même temps : c'est ce qui fait tomber le freinage pile sur
-        //    l'impact de la boule.
-        const duree = dureeTirage();
-
-        lanceur.placerAuDepart();
-        lanceur.jouer(duree, {
-          surImpact: () => { secouer(scene); vibrer(14); },
-          surArret: () => { vibrer([0, 12, 45, 22]); },
-        });
-
-        // La hauteur d'un cran est MESURÉE, jamais supposée : quelqu'un qui a
-        // agrandi le texte dans les réglages de son téléphone verrait sinon le
-        // rouleau s'immobiliser à cheval entre deux noms.
+        // 3. UNE SEULE timeline entraîne la boule ET les noms. La hauteur
+        //    d'un cran est MESURÉE, jamais supposée : quelqu'un qui a agrandi
+        //    le texte dans les réglages de son téléphone verrait sinon le
+        //    rouleau s'immobiliser à cheval entre deux noms.
         const hauteurCran = fenetre.getBoundingClientRect().height;
-        faireTourner(piste, bande.length, hauteurCran, duree, () => {
-          enCoursDAnimation = false;
-          claqueEnAttente = true;
-          // L'enregistrement n'a lieu qu'ici : redessiner plus tôt aurait
-          // effacé l'animation en cours.
-          ctx.majEtat(resultat.etat);
+
+        lanceur.jouer(dureeTirage(), {
+          rouleau: piste,
+          distance: (bande.length - 1) * hauteurCran,
+          surImpact: () => { secouer(scene); vibrer(14); },
+          surArret: () => {
+            vibrer([0, 12, 45, 22]);
+            enCoursDAnimation = false;
+            claqueEnAttente = true;
+            // L'enregistrement n'a lieu qu'ici : redessiner plus tôt aurait
+            // effacé l'animation en cours.
+            ctx.majEtat(resultat.etat);
+          },
         });
       },
     });
