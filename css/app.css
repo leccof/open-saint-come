@@ -570,6 +570,80 @@ body.a-navigation .contenu {
   text-align: center;
 }
 
+/* ----------------------------------------------------------------------------
+   LA PISTE — le lancer de boule
+   ----------------------------------------------------------------------------
+   Le motif de l'affiche, remis en mouvement : le cercle de lancement, l'arc,
+   le but. Les formes sont dessinées par views/lancer.js ; leurs couleurs sont
+   ici, comme partout ailleurs, et viennent des variables du thème.
+   ---------------------------------------------------------------------------- */
+
+.piste {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: var(--sc-e-2);
+  overflow: visible;
+}
+
+.piste__sol {
+  stroke: var(--sc-trait-tenu);
+  stroke-width: 1;
+}
+
+.piste__cercle {
+  fill: none;
+  stroke: var(--sc-trait);
+  stroke-width: 1.4;
+}
+
+.piste__but { fill: var(--sc-signal); }
+
+/* L'onde de choc. Elle s'efface en AMINCISSANT son trait, jamais en devenant
+   transparente : on ne mélange pas les encres. */
+.piste__impact {
+  fill: none;
+  stroke: var(--sc-trait);
+}
+
+.piste__boule-corps { fill: var(--sc-fond-inverse); }
+
+/* Les stries. Sans elles, une sphère qui roule ne se distingue pas d'une
+   sphère qui glisse — c'est ce détail qui donne son poids à la boule. */
+.piste__stries {
+  stroke: var(--sc-texte-inverse);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+}
+
+/* La secousse au moment de l'impact. Très courte, très petite : on doit la
+   sentir sans pouvoir la décrire. */
+@keyframes secousse {
+  0%   { transform: translate(0, 0); }
+  22%  { transform: translate(2px, 1.5px); }
+  46%  { transform: translate(-1.5px, -1px); }
+  70%  { transform: translate(1px, 0.5px); }
+  100% { transform: translate(0, 0); }
+}
+
+.secousse { animation: secousse 200ms var(--sc-courbe); }
+
+/* Le nom qui se verrouille : une prise de volume franche, immédiatement
+   rattrapée. C'est le « claquement ». */
+@keyframes claque {
+  0%   { transform: scale(1.07); }
+  100% { transform: scale(1); }
+}
+
+.rouleau--claque { animation: claque 160ms var(--sc-courbe); }
+
+/* Mouvement réduit demandé par le système : plus rien ne bouge, le nom
+   apparaît directement. */
+@media (prefers-reduced-motion: reduce) {
+  .secousse, .rouleau--claque { animation: none; }
+  .piste { display: none; }
+}
+
 /* La fenêtre : on ne voit qu'un cran de la piste à la fois. */
 .rouleau {
   height: var(--sc-rouleau-hauteur);

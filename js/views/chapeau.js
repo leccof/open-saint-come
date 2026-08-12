@@ -21,10 +21,12 @@ import {
   manquePourCompleter, bandeDeNoms,
 } from '../draw.js';
 import { creerTableauPrincipal } from '../bracket.js';
+import { creerPiste, secouer, vibrer, INSTANT_IMPACT } from './lancer.js';
 
 /* État éphémère de l'écran. */
 let enCoursDAnimation = false;
 let equipeEnEdition = null;
+let claqueEnAttente = false;   // le nom doit-il « claquer » au prochain dessin
 
 /**
  * Le dernier nom sorti.
@@ -62,9 +64,18 @@ function faireTourner(piste, nbCrans, hauteurCran, duree, quandFini) {
   function trame(maintenant) {
     const p = Math.min(1, (maintenant - depart) / duree);
 
-    // Freinage : rapide au début, presque immobile à la fin. C'est cette
-    // courbe qui donne l'impression d'une roue, et non d'un compte à rebours.
-    const freine = 1 - Math.pow(1 - p, 4);
+    /* LE FREINAGE EST EN DEUX TEMPS, et c'est tout l'effet.
+
+       Avant l'impact, la roue tourne encore presque à pleine vitesse : elle a
+       parcouru un peu plus de la moitié du chemin, mais rien ne semble décidé.
+       À la SECONDE où la boule touche le sol, elle freine d'un coup et va
+       mourir sur le nom.
+
+       Une décélération régulière donnerait un compte à rebours. Ce
+       décrochement-là donne un coup joué. */
+    const freine = p < INSTANT_IMPACT
+      ? 0.58 * Math.pow(p / INSTANT_IMPACT, 0.82)
+      : 0.58 + 0.42 * (1 - Math.pow(1 - (p - INSTANT_IMPACT) / (1 - INSTANT_IMPACT), 5));
 
     piste.style.transform = `translateY(${-freine * distance}px)`;
 
@@ -94,16 +105,25 @@ export function rendre(ctx) {
      LA SCÈNE — le rouleau et sa légende
      ====================================================================== */
 
+  /* Attention aux noms : « piste » désigne ici la bande de noms qui défile,
+     « lanceur » la scène où roule la boule. Deux choses différentes. */
+  const lanceur = creerPiste();
+
   const fenetre = h('div', { class: 'rouleau' });
   const piste = h('div', { class: 'rouleau__piste' });
   ajouter(fenetre, piste);
 
   const legende = h('p', { class: 'chapeau-scene__legende' });
+  const scene = h('div', { class: 'chapeau-scene' }, lanceur.element, fenetre, legende);
 
   /* Ce qu'on affiche à l'arrêt : le dernier nom sorti, ou une invitation. */
   function afficherRepos() {
     const dernierTire = dernierNomSorti(etat);
     piste.style.transform = 'translateY(0)';
+
+    // Au repos, la boule est soit dans le cercle (rien n'a encore été tiré),
+    // soit arrêtée contre le but (un nom vient de sortir).
+    if (dernierTire) lanceur.placerALArrivee(); else lanceur.placerAuDepart();
     if (dernierTire) {
       fenetre.classList.add('rouleau--arrete');
       piste.replaceChildren(
@@ -134,13 +154,21 @@ export function rendre(ctx) {
     } else {
       legende.replaceChildren('Appuyez pour faire sortir le premier nom.');
     }
+
+    // Le nom vient de se verrouiller : on le fait claquer. La classe est posée
+    // ici et non à la fin de l'animation, parce que l'enregistrement redessine
+    // l'écran juste après et emporterait tout élément ajouté avant.
+    if (claqueEnAttente) {
+      claqueEnAttente = false;
+      fenetre.classList.remove('rouleau--claque');
+      void fenetre.offsetWidth;          // force le navigateur à repartir de zéro
+      fenetre.classList.add('rouleau--claque');
+    }
   }
 
   afficherRepos();
 
-  ajouter(racine, 
-    h('div', { class: 'chapeau-scene' }, fenetre, legende)
-  );
+  ajouter(racine, scene);
 
   /* ======================================================================
      LE BOUTON
@@ -181,13 +209,24 @@ export function rendre(ctx) {
           ...bande.map((n) => h('div', { class: 'rouleau__nom' }, n))
         );
 
-        // 3. On tourne, on freine, on s'arrête net.
+        // 3. Le lancer et le rouleau partent sur la même image et durent le
+        //    même temps : c'est ce qui fait tomber le freinage pile sur
+        //    l'impact de la boule.
+        const duree = dureeTirage();
+
+        lanceur.placerAuDepart();
+        lanceur.jouer(duree, {
+          surImpact: () => { secouer(scene); vibrer(14); },
+          surArret: () => { vibrer([0, 12, 45, 22]); },
+        });
+
         // La hauteur d'un cran est MESURÉE, jamais supposée : quelqu'un qui a
         // agrandi le texte dans les réglages de son téléphone verrait sinon le
         // rouleau s'immobiliser à cheval entre deux noms.
         const hauteurCran = fenetre.getBoundingClientRect().height;
-        faireTourner(piste, bande.length, hauteurCran, dureeTirage(), () => {
+        faireTourner(piste, bande.length, hauteurCran, duree, () => {
           enCoursDAnimation = false;
+          claqueEnAttente = true;
           // L'enregistrement n'a lieu qu'ici : redessiner plus tôt aurait
           // effacé l'animation en cours.
           ctx.majEtat(resultat.etat);
