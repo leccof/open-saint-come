@@ -61,13 +61,7 @@ export function rendre(ctx) {
   const restants = etat.draw.remaining.length;
   const termine = tirageTermine(etat);
 
-  ajouter(racine, 
-    mention(etat.config.venue),
-    titre('Le chapeau'),
-    termine
-      ? chapo('Toutes les équipes sont formées.')
-      : chapo('Chaque nom tiré rejoint l’équipe en cours. Deux noms, une doublette.')
-  );
+
 
   /* ======================================================================
      LA SCÈNE — le rouleau et sa légende
@@ -82,7 +76,17 @@ export function rendre(ctx) {
   ajouter(fenetre, piste);
 
   const legende = h('p', { class: 'chapeau-scene__legende' });
-  const scene = h('div', { class: 'chapeau-scene' }, lanceur.element, fenetre, legende);
+
+  /* TROIS BANDES PLEINE LARGEUR, empilées : la piste sur fond sombre, le nom
+     sur fond d'argile, puis la légende sur le crème. C'est cette alternance
+     qui donne son rythme à l'écran — bien davantage qu'un cadre autour d'une
+     colonne. */
+  const scene = h('div', { class: 'bande bande--haut bande--sombre chapeau-scene' },
+    h('p', { class: 'mention' }, etat.config.venue),
+    h('h1', { class: 'titre-ecran' }, 'Le chapeau'),
+    lanceur.element);
+
+  const bandeNom = h('div', { class: 'bande bande--signal bande-nom' }, fenetre);
 
   /* Ce qu'on affiche à l'arrêt : le dernier nom sorti, ou une invitation. */
   function afficherRepos() {
@@ -134,7 +138,10 @@ export function rendre(ctx) {
 
   afficherRepos();
 
-  ajouter(racine, scene);
+  ajouter(racine, scene, bandeNom, legende,
+    termine
+      ? chapo('Toutes les équipes sont formées.')
+      : chapo('Chaque nom tiré rejoint l’équipe en cours. Deux noms, une doublette.'));
 
   /* ======================================================================
      LE BOUTON
@@ -240,7 +247,7 @@ export function rendre(ctx) {
     ajouter(racine, vide('Aucune équipe pour l’instant.'));
   } else {
     ajouter(racine, 
-      h('ul', {},
+      h('div', { class: 'grille-2' },
         etat.teams.map((equipe, i) => {
           if (equipeEnEdition === equipe.id) {
             let brouillon = equipe.name || '';

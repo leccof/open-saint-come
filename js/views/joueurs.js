@@ -36,23 +36,22 @@ export function rendre(ctx) {
 
   /* ---- en-tête et compteur ---------------------------------------------- */
   ajouter(racine, 
-    mention(etat.config.venue),
-    titre('Les joueurs'),
-    h('div', { class: 'entre-deux' },
-      h('div', { class: 'compteur' },
-        h('span', { class: 'compteur__nombre' }, String(joueurs.length)),
-        h('span', { class: 'compteur__libelle' },
-          joueurs.length > 1 ? 'joueurs inscrits' : 'joueur inscrit')
-      ),
-      etat.config.announcedPlayers
-        ? h('span', { class: 'ligne__secondaire' }, `sur ${etat.config.announcedPlayers} annoncés`)
-        : null
-    ),
-    plan
-      ? chapo(plan.tailles.includes(3)
-        ? `${plan.nbEquipes} équipes : ${plan.nbEquipes - 1} doublettes et une triplette.`
-        : `${plan.nbEquipes} doublettes.`)
-      : chapo('Ajoutez les joueurs au fur et à mesure des arrivées.')
+    h('div', { class: 'entete' },
+      h('span', { class: 'enorme' }, String(joueurs.length)),
+      h('div', { class: 'entete__texte' },
+        h('p', { class: 'mention' }, etat.config.venue),
+        h('p', { class: 'entete__quoi' },
+          joueurs.length > 1 ? 'joueurs inscrits' : 'joueur inscrit'),
+        etat.config.announcedPlayers
+          ? h('p', { class: 'ligne__secondaire' }, `sur ${etat.config.announcedPlayers} annoncés`)
+          : null,
+        plan
+          ? h('p', { class: 'ligne__secondaire' }, plan.tailles.includes(3)
+            ? `${plan.nbEquipes} équipes, dont une triplette`
+            : `${plan.nbEquipes} doublettes`)
+          : null
+      )
+    )
   );
 
   /* ---- saisie ------------------------------------------------------------ */
@@ -89,13 +88,14 @@ export function rendre(ctx) {
     }
 
     ajouter(racine, 
-      h('div', { class: 'champ-groupe' },
+      h('div', { class: 'bande bande--sombre' },
         h('label', { class: 'champ-libelle', for: 'nouveau-joueur' }, 'Ajouter un joueur'),
         h('div', { class: 'saisie-ligne' },
           champ,
           bouton('Ajouter', { variante: 'bouton--action', onclick: ajouterLeJoueur })
         ),
-        erreur ? h('p', { class: 'champ-erreur' }, erreur) : null
+        h('p', { class: 'champ-erreur' },
+          erreur || 'Tapez un nom, appuyez sur Entrée, enchaînez.')
       )
     );
 
@@ -162,14 +162,16 @@ export function rendre(ctx) {
     );
   }
 
-  /* ---- la liste ---------------------------------------------------------- */
-  ajouter(racine, filet());
-
+  /* ---- la liste, sur deux colonnes ----------------------------------------
+     Vingt joueurs se voient d'un seul coup d'œil au lieu de six. C'est la
+     différence entre chercher un nom et le trouver. */
   if (!joueurs.length) {
     ajouter(racine, vide('Aucun joueur pour l’instant.'));
   } else {
-    ajouter(racine, 
-      h('ul', { class: 'liste' },
+    ajouter(racine,
+      h('p', { class: 'mention mention--liste' },
+        fige ? 'La liste est close' : 'Touchez un nom pour le corriger'),
+      h('div', { class: 'grille-2' },
         joueurs.map((joueur, i) => {
           if (idEnEdition === joueur.id) {
             let brouillon = joueur.name;
@@ -190,46 +192,33 @@ export function rendre(ctx) {
             };
             queueMicrotask(() => { champEdit.focus(); champEdit.select(); });
 
-            return h('li', { class: 'ligne' },
-              h('span', { class: 'ligne__numero' }, String(i + 1)),
-              h('div', { class: 'ligne__principal' }, champEdit),
-              h('div', { class: 'ligne__actions' },
-                bouton('OK', { variante: 'bouton--action', onclick: valider })
-              )
+            // Pendant l'édition, le jeton prend les deux colonnes.
+            return h('div', { class: 'saisie-ligne jeton--pleine' },
+              champEdit,
+              bouton('OK', { variante: 'bouton--action', onclick: valider })
             );
           }
 
           const enDouble = lesDoublons.some((d) => d.ids.includes(joueur.id));
 
-          return h('li', { class: 'ligne' },
-            h('span', { class: 'ligne__numero' }, String(i + 1)),
-            h('span', { class: 'ligne__principal' },
-              joueur.name,
-              enDouble ? h('span', { class: 'ligne__secondaire' }, ' · en double') : null
-            ),
-            /* Le crayon reste disponible MÊME APRÈS le lancement du tirage :
-               corriger une faute de frappe ne change rien au tirage, et c'est
-               précisément en lisant les noms à voix haute qu'on repère les
-               coquilles. Seuls l'ajout et la suppression sont bloqués, parce
-               qu'eux modifieraient l'effectif. */
-            h('div', { class: 'ligne__actions' },
-              h('button', {
-                class: 'bouton-icone',
-                type: 'button',
-                'aria-label': `Modifier ${joueur.name}`,
-                onclick: () => { idEnEdition = joueur.id; ctx.rafraichir(); },
-              }, '✎'),
-              fige ? null : h('button', {
-                class: 'bouton-icone',
-                type: 'button',
-                'aria-label': `Retirer ${joueur.name}`,
-                onclick: () => {
-                  if (confirm(`Retirer ${joueur.name} de la liste ?`)) {
-                    ctx.majEtat(supprimerJoueur(ctx.etat, joueur.id));
-                  }
-                },
-              }, '✕')
-            )
+          return h('div', { class: 'jeton' + (enDouble ? ' jeton--double' : '') },
+            h('span', { class: 'jeton__rang' }, String(i + 1)),
+            h('button', {
+              class: 'jeton__nom jeton__bouton',
+              type: 'button',
+              'aria-label': `Modifier ${joueur.name}`,
+              onclick: () => { idEnEdition = joueur.id; ctx.rafraichir(); },
+            }, joueur.name),
+            fige ? null : h('button', {
+              class: 'jeton__action',
+              type: 'button',
+              'aria-label': `Retirer ${joueur.name}`,
+              onclick: () => {
+                if (confirm(`Retirer ${joueur.name} de la liste ?`)) {
+                  ctx.majEtat(supprimerJoueur(ctx.etat, joueur.id));
+                }
+              },
+            }, '✕')
           );
         })
       )

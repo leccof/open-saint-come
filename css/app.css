@@ -328,6 +328,167 @@ body.a-navigation .contenu {
 }
 
 /* ============================================================================
+   3 ter. LES PRIMITIVES DE COMPOSITION
+   ----------------------------------------------------------------------------
+   Ce qui fait qu'un écran est composé, et pas seulement empilé.
+
+   Jusqu'ici tout vivait dans une colonne étroite et centrée : titre, phrase,
+   liste, bouton, à la queue leu leu. C'est lisible, mais c'est plat. Ces
+   quatre outils cassent cette monotonie sans rien coûter à la lisibilité :
+
+     .bande      un bloc qui sort des marges et touche les deux bords
+     .enorme     un chiffre traité comme une image, pas comme un mot
+     .grille-2   deux colonnes là où on empilait
+     .entete     un chiffre en marge, et le titre qui prend toute la place
+
+   L'alternance crème / basalte donne le rythme. Le débordement donne l'échelle.
+   ============================================================================ */
+
+/* --- la bande pleine largeur -------------------------------------------------
+   Elle annule la marge du contenu pour toucher les deux bords de l'écran.
+   C'est ce qui transforme une suite de paragraphes en une suite de blocs. */
+.bande {
+  margin-inline: calc(-1 * var(--sc-e-4));
+  padding: var(--sc-e-5) var(--sc-e-4);
+}
+
+.bande + .bande { margin-top: 0; }
+
+/* Une bande placée en tête d'écran remonte jusqu'au bandeau : sans cela, un
+   liseré crème traîne entre les deux et casse le bloc. */
+.bande--haut { margin-top: calc(-1 * var(--sc-e-5)); }
+
+.bande--sombre {
+  background: var(--sc-fond-inverse);
+  color: var(--sc-texte-inverse);
+}
+
+/* Sur la bande sombre, les textes secondaires repassent en clair : leur teinte
+   habituelle y serait illisible, à 1,38:1. */
+.bande--sombre .mention,
+.bande--sombre .ligne__secondaire,
+.bande--sombre .champ-libelle,
+.bande--sombre .champ-erreur { color: var(--sc-texte-inverse); }
+
+.bande--sombre .bouton {
+  color: var(--sc-texte-inverse);
+  border-color: var(--sc-texte-inverse);
+}
+.bande--sombre .bouton--action {
+  background: var(--sc-signal);
+  border-color: var(--sc-signal);
+  color: var(--sc-signal-texte);
+}
+
+/* La bande de signal : réservée aux moments — le vainqueur, le nom tiré.
+   ⚠ GRAND TEXTE UNIQUEMENT, l'argile ne porte pas de texte courant. */
+.bande--signal {
+  background: var(--sc-signal);
+  color: var(--sc-signal-texte);
+}
+
+/* --- le chiffre traité comme une image --------------------------------------
+   Un nombre qui compte doit se voir de loin, à bout de bras, au soleil. À
+   cette taille il ne se lit plus, il se reconnaît. */
+.enorme {
+  font-family: var(--sc-police-titre);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  font-size: clamp(4.5rem, 26vw, 8rem);
+  font-weight: var(--sc-graisse-titre);
+  line-height: 0.78;
+  letter-spacing: -0.045em;
+  display: block;
+}
+
+/* --- l'en-tête d'écran ------------------------------------------------------
+   Le chiffre à gauche, l'information à droite, alignés sur leur base. */
+.entete {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sc-e-4);
+  align-items: end;
+  margin-bottom: var(--sc-e-5);
+}
+
+.entete__texte { padding-bottom: 0.35em; min-width: 0; }
+
+.entete__quoi {
+  font-family: var(--sc-police-titre);
+  font-size: var(--sc-t-grand);
+  line-height: 1.05;
+}
+
+/* --- deux colonnes ----------------------------------------------------------
+   Une liste de noms courts n'a aucune raison d'occuper toute la largeur pour
+   un seul élément. À deux colonnes, on voit vingt joueurs d'un coup d'œil au
+   lieu de six. */
+.grille-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sc-e-2);
+}
+
+/* Un jeton : un nom dans un cadre, cliquable au doigt. */
+.jeton {
+  display: flex;
+  align-items: center;
+  gap: var(--sc-e-2);
+  min-height: var(--sc-cible-min);
+  padding: var(--sc-e-2) var(--sc-e-3);
+  border: var(--sc-trait-tenu-epaisseur) solid var(--sc-trait-tenu);
+  border-radius: var(--sc-arrondi);
+  min-width: 0;
+}
+
+.jeton__rang {
+  flex: none;
+  font-family: var(--sc-police-chiffres);
+  font-variant-numeric: var(--sc-chiffres-reglage);
+  font-size: var(--sc-t-micro);
+  color: var(--sc-texte-doux);
+}
+
+/* Le nom passe à la ligne plutôt que d'être tronqué. « Jean-Mic… » ne sert à
+   rien le jour où deux Jean-Michel sont inscrits — et c'est exactement ce qui
+   arrive dans un concours de village. */
+.jeton__nom {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+}
+
+.jeton__action {
+  flex: none;
+  width: 2rem; height: 2rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--sc-t-base);
+  color: var(--sc-texte-doux);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.jeton--double { border-color: var(--sc-trait); border-width: var(--sc-trait-epaisseur); }
+
+/* Le nom est un bouton, mais rien ne doit le trahir : c'est la ligne entière
+   qui répond au doigt. */
+.jeton__bouton {
+  text-align: left;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* En cours d'édition, le jeton s'étale sur les deux colonnes. */
+.jeton--pleine { grid-column: 1 / -1; }
+
+.mention--liste { margin-bottom: var(--sc-e-2); }
+
+/* ============================================================================
    4. BOUTONS
    ----------------------------------------------------------------------------
    Trois formes seulement :
@@ -663,13 +824,21 @@ body.a-navigation .contenu {
    fondu, pas de rebond. Le silence qui suit fait partie de l'effet.
    ============================================================================ */
 
-.chapeau-scene {
-  border: var(--sc-trait-epaisseur) solid var(--sc-trait);
-  border-radius: var(--sc-arrondi);
-  padding: var(--sc-e-4) var(--sc-e-3);
-  margin-bottom: var(--sc-e-5);
-  text-align: center;
-}
+/* La scène du tirage : une bande sombre pleine largeur. Le cadre a disparu —
+   c'est la bande elle-même qui fait le cadre, d'un bord à l'autre de l'écran. */
+.chapeau-scene { padding-bottom: var(--sc-e-3); }
+
+/* Sur fond sombre, la piste s'inverse : la terre d'ombre y serait invisible
+   (1,38:1), et la boule doit passer en crème pour rester lisible. */
+.bande--sombre .piste__cercle,
+.bande--sombre .piste__impact { stroke: var(--sc-signal); }
+.bande--sombre .piste__sol { stroke: var(--sc-signal); }
+.bande--sombre .piste__boule-corps { fill: var(--sc-texte-inverse); }
+.bande--sombre .piste__stries { stroke: var(--sc-fond-inverse); }
+
+/* La bande du nom tiré : plein cadre, en argile. Le nom y est énorme, donc
+   très au-delà du seuil qui autorise cette couleur à porter du texte. */
+.bande-nom { text-align: center; padding-block: var(--sc-e-3); }
 
 /* ----------------------------------------------------------------------------
    LA PISTE — le lancer de boule
@@ -741,12 +910,12 @@ body.a-navigation .contenu {
 
 .rouleau__nom {
   height: var(--sc-rouleau-hauteur);
+  font-size: var(--sc-t-hero);
   display: flex;
   align-items: center;
   justify-content: center;
 
   font-family: var(--sc-police-titre);
-  font-size: var(--sc-t-nom-tire);
   font-weight: var(--sc-graisse-titre);
   line-height: 1;
   letter-spacing: var(--sc-lettres-titre);
@@ -757,13 +926,9 @@ body.a-navigation .contenu {
   padding: 0 var(--sc-e-2);
 }
 
-/* Le nom arrêté. L'aplat d'argile ne porte ici que ce très grand texte —
-   largement au-delà du seuil de 24 px qui l'autorise. */
-.rouleau--arrete {
-  background: var(--sc-signal);
-  color: var(--sc-signal-texte);
-  border-radius: var(--sc-arrondi);
-}
+/* Le nom arrêté : c'est désormais la bande entière qui porte l'argile, le
+   rouleau n'a plus de fond propre. */
+.rouleau--arrete { color: var(--sc-signal-texte); }
 
 .chapeau-scene__legende {
   margin-top: var(--sc-e-3);
