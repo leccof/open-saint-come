@@ -8,6 +8,7 @@
 
 import { ajouter, h, titre, mention, chapo, filet, bouton } from './dom.js';
 import { INTRO, SECTIONS, LIEN_FFPJP } from '../rules-data.js';
+import { VERSION_APP } from '../app.js';
 
 export function rendre() {
   const racine = h('div');
@@ -87,6 +88,12 @@ export function rendre() {
           rel: 'noopener noreferrer',
         }, LIEN_FFPJP.libelle)))
   );
+
+  /* Le repère de version. Discret, mais c'est lui qui permet de dire « tu es
+     sur une vieille copie, recharge » au lieu de chercher un bug qui n'existe
+     pas. */
+  ajouter(racine,
+    h('p', { class: 'mention centre version-app' }, `Version ${VERSION_APP}`));
 
   return racine;
 }

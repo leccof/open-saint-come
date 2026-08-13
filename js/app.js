@@ -31,6 +31,19 @@ import { entreeEcran, brancherToucher } from './views/anim.js';
    ÉLÉMENTS DE LA PAGE
    ---------------------------------------------------------------------------- */
 
+/* Le numéro de version de l'application.
+   ----------------------------------------------------------------------------
+   Il sert à trancher une question qui revient sans cesse : « est-ce que ma
+   correction est bien arrivée sur le téléphone ? » GitHub Pages demande aux
+   navigateurs de garder les fichiers dix minutes en mémoire, et une app
+   ajoutée à l'écran d'accueil peut les garder bien plus longtemps. Sans
+   repère visible, impossible de distinguer un bug d'une vieille copie.
+
+   Il est affiché en bas de la page des règles, et écrit dans la console. */
+export const VERSION_APP = 'd8e5078';
+
+console.info('[Open de Saint-Côme] version', VERSION_APP);
+
 const elContenu = document.getElementById('contenu');
 const elStatut = document.getElementById('statut');
 const elNav = document.getElementById('nav');
