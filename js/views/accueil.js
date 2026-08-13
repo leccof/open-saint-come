@@ -10,7 +10,41 @@
 import { ajouter, h, remplir, titre, mention, chapo, filet, bouton, dateLisible } from './dom.js';
 import * as storage from '../storage.js';
 import { creerEtatInitial } from '../state.js';
+import { revelerTitre, animerMotif } from './anim.js';
 import { DEFAULT_TOURNAMENT_NAME } from '../../config.js';
+
+/* ----------------------------------------------------------------------------
+   LE MOTIF DE FOND
+   ----------------------------------------------------------------------------
+   Le diagramme de l'affiche, repris tel quel : les cercles de mesure autour du
+   but, et la trajectoire qui y mène. Il déborde du cadre à dessein — on n'en
+   voit qu'un morceau, et le terrain semble continuer au-delà de l'écran.
+   ---------------------------------------------------------------------------- */
+
+const NS = 'http://www.w3.org/2000/svg';
+
+function motifOuverture() {
+  const el = (balise, attributs) => {
+    const e = document.createElementNS(NS, balise);
+    for (const [k, v] of Object.entries(attributs)) e.setAttribute(k, v);
+    return e;
+  };
+
+  const svg = el('svg', {
+    class: 'hero__motif', viewBox: '0 0 260 200', 'aria-hidden': 'true',
+  });
+
+  const cx = 176, cy = 74;                       // le but
+  for (const r of [18, 34, 52, 72, 94, 118]) {
+    svg.append(el('circle', { class: 'motif__anneau', cx, cy, r }));
+  }
+  svg.append(el('path', { class: 'motif__arc', d: `M 26 168 Q 96 4 ${cx} ${cy}` }));
+  svg.append(el('circle', { class: 'motif__but', cx, cy, r: 3.6 }));
+  return svg;
+}
+
+/** Une ligne de titre, derrière sa fenêtre : elle monte depuis dessous. */
+const ligneTitre = (texte) => h('span', { class: 'titre-masque' }, h('span', {}, texte));
 
 /* État éphémère de l'écran : ce que la personne est en train de taper. */
 let codeSaisi = '';
@@ -32,13 +66,6 @@ function prochain15Aout() {
 
 export function rendre(ctx) {
   const racine = h('div');
-
-  /* ---- en-tête ---------------------------------------------------------- */
-  ajouter(racine, 
-    mention('Saint-Côme-d’Olt · Pétanque en doublette'),
-    titre('Open de Saint-Côme'),
-    chapo('Créez un tournoi, ou rejoignez-en un avec son code à six caractères.')
-  );
 
   /* ---- créer ------------------------------------------------------------ */
   const boutonCreer = bouton(occupe ? 'Création…' : 'Créer un tournoi', {
@@ -65,7 +92,30 @@ export function rendre(ctx) {
     },
   });
 
-  ajouter(racine, h('div', { class: 'boutons' }, boutonCreer));
+  /* ---- l'écran d'ouverture ---------------------------------------------- */
+  const motif = motifOuverture();
+  const hero = h('section', { class: 'hero' },
+    motif,
+    h('div', { class: 'hero__contenu' },
+      h('p', { class: 'hero__mention' }, 'Saint-Côme-d’Olt · 15 août'),
+      h('h1', { class: 'hero__titre' }, ligneTitre('Open'), ligneTitre('de Saint-Côme')),
+      h('p', { class: 'hero__chapo' },
+        'Concours en doublette à la mêlée. Les équipes sont tirées au chapeau.'),
+      h('div', { class: 'boutons' }, boutonCreer)
+    )
+  );
+
+  ajouter(racine, hero);
+
+  /* L'ouverture ne se joue qu'à l'arrivée sur l'écran, pas à chaque fois qu'on
+     tape un caractère dans le champ du code. Le microtask attend que l'élément
+     soit dans la page : sans cela, la longueur du tracé vaudrait zéro. */
+  if (ctx.premierRendu) {
+    queueMicrotask(() => {
+      revelerTitre(hero.querySelectorAll('.titre-masque > span'), 0.06);
+      animerMotif(motif, 0.1);
+    });
+  }
 
   /* ---- rejoindre -------------------------------------------------------- */
   ajouter(racine, filet());

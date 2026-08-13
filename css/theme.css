@@ -132,7 +132,13 @@
   --sc-t-base:    1rem;      /* 16px — texte courant, minimum absolu        */
   --sc-t-moyen:   1.25rem;   /* 20px — noms de joueurs, libellés de boutons */
   --sc-t-grand:   1.5rem;    /* 24px — seuil du « grand texte » WCAG        */
-  --sc-t-titre:   2rem;      /* 32px — titres d'écran                       */
+  /* Les titres d'écran s'adaptent à la largeur : sur un grand téléphone ils
+     prennent de l'ampleur, sur un petit ils restent tenables. */
+  --sc-t-titre:   clamp(2rem, 8.5vw, 2.75rem);   /* titres d'écran           */
+
+  /* Le titre d'ouverture. C'est le plus grand caractère de l'application, et
+     il n'apparaît qu'une fois : sur l'accueil. */
+  --sc-t-hero:    clamp(2.35rem, 11.4vw, 4rem);
   --sc-t-geant:   3rem;      /* 48px — les scores, les compteurs            */
 
   /* Le nom tiré au chapeau : c'est le plus gros texte de toute l'application.

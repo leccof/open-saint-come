@@ -25,6 +25,7 @@ import * as vueChapeau from './views/chapeau.js';
 import * as vueTableaux from './views/tableaux.js';
 import * as vueResultats from './views/resultats.js';
 import * as vueRegles from './views/regles.js';
+import { entreeEcran, brancherToucher } from './views/anim.js';
 
 /* ----------------------------------------------------------------------------
    ÉLÉMENTS DE LA PAGE
@@ -187,11 +188,18 @@ function dessinerBandeau() {
  * connaître du reste de l'application : l'état, comment le modifier, comment
  * naviguer, comment se redessiner.
  */
+/* Vrai uniquement au premier dessin d'un écran donné. Les vues s'en servent
+   pour ne jouer leur animation d'arrivée qu'une fois, et non à chaque frappe
+   au clavier. */
+let vuePrecedente = null;
+let premierRendu = true;
+
 function contexte() {
   return {
     etat,
     majEtat,
     allerA,
+    premierRendu,
     /* rafraichir() redessine SANS enregistrer : pour les changements purement
        visuels (ouvrir un champ, afficher un message) qui n'ont rien à faire
        dans la base de données. */
@@ -235,13 +243,19 @@ function dessinerEcran() {
   dessinerBandeau();
   dessinerNav();
 
+  const cle = `${route.nom}/${route.section || ''}`;
+  premierRendu = cle !== vuePrecedente;
+  vuePrecedente = cle;
+
   if (route.nom === 'regles') {
     remplir(elContenu, vueRegles.rendre());
+    apresRendu();
     return;
   }
 
   if (route.nom === 'accueil') {
     remplir(elContenu, vueAccueil.rendre(contexte()));
+    apresRendu();
     return;
   }
 
@@ -255,24 +269,28 @@ function dessinerEcran() {
   const ctx = contexte();
 
   switch (route.section) {
-    case 'config':
-      remplir(elContenu, vueConfig.rendre(ctx));
-      return;
-    case 'joueurs':
-      remplir(elContenu, vueJoueurs.rendre(ctx));
-      return;
-    case 'chapeau':
-      remplir(elContenu, vueChapeau.rendre(ctx));
-      return;
-    case 'tableaux':
-      remplir(elContenu, vueTableaux.rendre(ctx));
-      return;
-    case 'resultats':
-      remplir(elContenu, vueResultats.rendre(ctx));
-      return;
-    default:
-      remplir(elContenu, vueJoueurs.rendre(ctx));
+    case 'config':    remplir(elContenu, vueConfig.rendre(ctx)); break;
+    case 'joueurs':   remplir(elContenu, vueJoueurs.rendre(ctx)); break;
+    case 'chapeau':   remplir(elContenu, vueChapeau.rendre(ctx)); break;
+    case 'tableaux':  remplir(elContenu, vueTableaux.rendre(ctx)); break;
+    case 'resultats': remplir(elContenu, vueResultats.rendre(ctx)); break;
+    default:          remplir(elContenu, vueJoueurs.rendre(ctx));
   }
+  apresRendu();
+}
+
+/**
+ * Ce qui suit chaque dessin : l'écran se pose, et les boutons deviennent
+ * sensibles au doigt.
+ *
+ * L'entrée en scène ne se joue qu'à l'ARRIVÉE sur un écran. Sans cette
+ * condition, saisir un joueur relancerait toute l'animation à chaque lettre —
+ * insupportable, et exactement le genre de détail qui fait qu'une app « fait
+ * cheap ».
+ */
+function apresRendu() {
+  if (premierRendu) entreeEcran(elContenu);
+  brancherToucher(elContenu);
 }
 
 /* ----------------------------------------------------------------------------

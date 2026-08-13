@@ -227,6 +227,107 @@ body.a-navigation .contenu {
 }
 
 /* ============================================================================
+   3 bis. L'ÉCRAN D'OUVERTURE
+   ----------------------------------------------------------------------------
+   Le seul endroit de l'application qui cherche l'effet. Un aplat de basalte
+   pleine largeur, le titre en très grand, et le diagramme de l'affiche —
+   cercles de mesure, trajectoire, but — qui se dessine derrière.
+
+   Tout le texte y est en crème : 8,40:1, le meilleur contraste de la palette.
+   L'argile n'y sert qu'aux traits du motif et au bouton, où elle ne porte que
+   du grand caractère.
+   ============================================================================ */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+
+  /* Pleine largeur : on ressort des marges du contenu. */
+  margin: calc(-1 * var(--sc-e-5)) calc(-1 * var(--sc-e-4)) var(--sc-e-6);
+  padding: var(--sc-e-7) var(--sc-e-4) var(--sc-e-6);
+
+  background: var(--sc-fond-inverse);
+  color: var(--sc-texte-inverse);
+}
+
+/* Le diagramme, en fond. Il déborde volontairement du cadre : on n'en voit
+   qu'un morceau, ce qui suggère que le terrain continue au-delà. */
+.hero__motif {
+  position: absolute;
+  top: -6%;
+  right: -20%;
+  width: 92%;
+  height: auto;
+  pointer-events: none;
+}
+
+.hero__motif .motif__anneau,
+.hero__motif .motif__arc {
+  fill: none;
+  stroke: var(--sc-signal);
+  stroke-width: 0.7;
+}
+.hero__motif .motif__arc { stroke-width: 1.1; }
+.hero__motif .motif__but { fill: var(--sc-signal); }
+
+.hero__contenu { position: relative; }   /* au-dessus du motif */
+
+.hero__mention {
+  font-size: var(--sc-t-micro);
+  font-weight: var(--sc-graisse-forte);
+  letter-spacing: var(--sc-lettres-capitales);
+  text-transform: uppercase;
+  margin-bottom: var(--sc-e-3);
+}
+
+.hero__titre {
+  font-family: var(--sc-police-titre);
+  font-size: var(--sc-t-hero);
+  font-weight: var(--sc-graisse-titre);
+  line-height: 1;
+  letter-spacing: -0.022em;
+  margin-bottom: var(--sc-e-4);
+}
+
+/* Chaque ligne du titre vit derrière une fenêtre : elle monte depuis dessous,
+   comme une affiche qu'on décolle.
+
+   DEUX PIÈGES, tous deux apparus au premier essai :
+
+   · `overflow: hidden` coupe aussi les jambages et les accents. On rend donc
+     un peu de place en bas, aussitôt reprise par une marge négative — la
+     fenêtre respire sans que la mise en page bouge d'un pixel.
+
+   · sans `nowrap`, un titre trop long passe à la ligne À L'INTÉRIEUR de la
+     fenêtre, et cette deuxième ligne est purement et simplement masquée. On
+     lisait « de Saint- », et plus de Côme. */
+.titre-masque {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.titre-masque > span {
+  display: block;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.hero__chapo {
+  font-size: var(--sc-t-base);
+  max-width: 26ch;
+  margin-bottom: var(--sc-e-5);
+}
+
+/* Le bouton de l'accueil : un aplat d'argile sur le basalte. 4,49:1 — réservé
+   au grand caractère, ce qui est le cas ici (20 px gras). */
+.hero .bouton--action {
+  background: var(--sc-signal);
+  border-color: var(--sc-signal);
+  color: var(--sc-signal-texte);
+}
+
+/* ============================================================================
    4. BOUTONS
    ----------------------------------------------------------------------------
    Trois formes seulement :
