@@ -39,8 +39,10 @@ import { entreeEcran, brancherToucher } from './views/anim.js';
    ajoutée à l'écran d'accueil peut les garder bien plus longtemps. Sans
    repère visible, impossible de distinguer un bug d'une vieille copie.
 
-   Il est affiché en bas de la page des règles, et écrit dans la console. */
-export const VERSION_APP = 'd8e5078';
+   C'est l'heure de la mise en ligne, et non le numéro du commit : celui-ci
+   ne peut pas se connaître lui-même au moment où on l'écrit, et décalerait
+   donc toujours d'une version. */
+export const VERSION_APP = '13/08 14h45';
 
 console.info('[Open de Saint-Côme] version', VERSION_APP);
 
